@@ -1,32 +1,6 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
-import fs from "fs";
-import path from "path";
-
-const LEADS_FILE_PATH = path.join(process.cwd(), "src/data/leads.json");
-
-// Helper to ensure data folder and leads.json exist
-function writeLeadToFile(leadData: any) {
-  const dir = path.dirname(LEADS_FILE_PATH);
-  
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-
-  let leads = [];
-  if (fs.existsSync(LEADS_FILE_PATH)) {
-    try {
-      const fileContent = fs.readFileSync(LEADS_FILE_PATH, "utf8");
-      leads = JSON.parse(fileContent || "[]");
-    } catch (e) {
-      console.error("Error reading leads file, resetting:", e);
-      leads = [];
-    }
-  }
-
-  leads.push(leadData);
-  fs.writeFileSync(LEADS_FILE_PATH, JSON.stringify(leads, null, 2), "utf8");
-}
+import { createLead } from "@/lib/leads";
 
 export async function POST(request: Request) {
   try {
@@ -43,8 +17,8 @@ export async function POST(request: Request) {
     // Check if it's a mock order
     if (razorpay_order_id.startsWith("order_mock_")) {
       console.log("Verifying Sandbox/Mock payment...");
-      
-      const newLead = {
+
+      const lead = await createLead({
         id: `lead_${Math.random().toString(36).substring(2, 11)}`,
         type: "build_ready",
         status: "paid",
@@ -56,13 +30,10 @@ export async function POST(request: Request) {
           currency: "USD",
           verified: true,
           method: "sandbox_simulated"
-        },
-        booking: null, // to be scheduled in the next step
-        createdAt: new Date().toISOString()
-      };
+        }
+      });
 
-      writeLeadToFile(newLead);
-      return NextResponse.json({ verified: true, lead: newLead });
+      return NextResponse.json({ verified: true, lead });
     }
 
     // Real Signature Verification
@@ -94,8 +65,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // Save verified paid lead to JSON DB
-    const newLead = {
+    // Save verified paid lead
+    const lead = await createLead({
       id: `lead_${Math.random().toString(36).substring(2, 11)}`,
       type: "build_ready",
       status: "paid",
@@ -106,14 +77,10 @@ export async function POST(request: Request) {
         amount: 99.00, // or ₹8,200 depending on final currency
         verified: true,
         method: "razorpay_checkout"
-      },
-      booking: null,
-      createdAt: new Date().toISOString()
-    };
+      }
+    });
 
-    writeLeadToFile(newLead);
-
-    return NextResponse.json({ verified: true, lead: newLead });
+    return NextResponse.json({ verified: true, lead });
 
   } catch (error: any) {
     console.error("Error in Payment Verification API:", error);

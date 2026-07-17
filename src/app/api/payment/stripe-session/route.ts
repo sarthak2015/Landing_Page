@@ -1,44 +1,9 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import fs from "fs";
-import path from "path";
+import { createLead } from "@/lib/leads";
 
 // Initialize Stripe with the Secret Key from environment
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
-
-const LEADS_FILE_PATH = path.join(process.cwd(), "src/data/leads.json");
-
-// Helper to write lead to leads.json database
-function savePendingLead(leadId: string, formData: any) {
-  const dir = path.dirname(LEADS_FILE_PATH);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-
-  let leads = [];
-  if (fs.existsSync(LEADS_FILE_PATH)) {
-    try {
-      const fileContent = fs.readFileSync(LEADS_FILE_PATH, "utf8");
-      leads = JSON.parse(fileContent || "[]");
-    } catch (e) {
-      console.error("Error reading leads file, resetting:", e);
-      leads = [];
-    }
-  }
-
-  const newLead = {
-    id: leadId,
-    type: "build_ready",
-    status: "pending",
-    formData: formData,
-    payment: null,
-    booking: null,
-    createdAt: new Date().toISOString()
-  };
-
-  leads.push(newLead);
-  fs.writeFileSync(LEADS_FILE_PATH, JSON.stringify(leads, null, 2), "utf8");
-}
 
 export async function POST(request: Request) {
   try {
@@ -54,13 +19,11 @@ export async function POST(request: Request) {
     // Generate a unique lead ID
     const leadId = `lead_${Math.random().toString(36).substring(2, 11)}`;
 
-    // Save lead details as pending in leads.json.
-    // This is best-effort local logging only — on serverless hosts (e.g. Vercel)
-    // the filesystem is read-only, so this write fails there. It must never
-    // block Stripe session creation; the full formData already rides in
-    // session metadata below so checkout can proceed without it.
+    // Save lead details as pending. Best-effort: it must never block Stripe
+    // session creation — the full formData already rides in session metadata
+    // below so checkout can proceed even if this write fails.
     try {
-      savePendingLead(leadId, formData);
+      await createLead({ id: leadId, type: "build_ready", status: "pending", formData });
     } catch (e) {
       console.error("Failed to persist pending lead (non-fatal):", e);
     }

@@ -1,37 +1,8 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import fs from "fs";
-import path from "path";
+import { createLead } from "@/lib/leads";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
-
-const LEADS_FILE_PATH = path.join(process.cwd(), "src/data/leads.json");
-
-function savePendingLead(leadId: string, formData: any) {
-  const dir = path.dirname(LEADS_FILE_PATH);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-
-  let leads: any[] = [];
-  if (fs.existsSync(LEADS_FILE_PATH)) {
-    try {
-      leads = JSON.parse(fs.readFileSync(LEADS_FILE_PATH, "utf8") || "[]");
-    } catch {
-      leads = [];
-    }
-  }
-
-  leads.push({
-    id: leadId,
-    type: "build_ready",
-    status: "pending",
-    formData,
-    payment: null,
-    booking: null,
-    createdAt: new Date().toISOString()
-  });
-
-  fs.writeFileSync(LEADS_FILE_PATH, JSON.stringify(leads, null, 2), "utf8");
-}
 
 export async function POST(request: Request) {
   try {
@@ -43,8 +14,12 @@ export async function POST(request: Request) {
 
     const leadId = `lead_${Math.random().toString(36).substring(2, 11)}`;
 
-    // Save pending lead draft
-    savePendingLead(leadId, formData);
+    // Save pending lead draft (best-effort, must not block payment setup)
+    try {
+      await createLead({ id: leadId, type: "build_ready", status: "pending", formData });
+    } catch (e) {
+      console.error("Failed to persist pending lead (non-fatal):", e);
+    }
 
     // Create Stripe PaymentIntent
     const paymentIntent = await stripe.paymentIntents.create({

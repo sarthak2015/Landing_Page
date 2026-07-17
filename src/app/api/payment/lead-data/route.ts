@@ -1,8 +1,5 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
-
-const LEADS_FILE_PATH = path.join(process.cwd(), "src/data/leads.json");
+import { getLead } from "@/lib/leads";
 
 export async function GET(request: Request) {
   try {
@@ -13,14 +10,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Missing lead_id parameter" }, { status: 400 });
     }
 
-    if (!fs.existsSync(LEADS_FILE_PATH)) {
-      return NextResponse.json({ error: "No leads database found" }, { status: 404 });
-    }
-
-    const fileContent = fs.readFileSync(LEADS_FILE_PATH, "utf-8");
-    const leads = JSON.parse(fileContent || "[]");
-
-    const lead = leads.find((l: any) => l.id === leadId);
+    const lead = await getLead(leadId);
 
     if (!lead) {
       return NextResponse.json({ error: "Lead not found" }, { status: 404 });
