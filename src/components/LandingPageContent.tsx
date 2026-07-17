@@ -142,9 +142,6 @@ export default function LandingPageContent() {
             <a href="#features-section">Features</a>
             <a href="#testimonials-section">Reviews</a>
             <a href="#faq-section">FAQ</a>
-            <a href="/admin" className={styles.adminLink} target="_blank">
-              Admin Console
-            </a>
           </div>
         </div>
       </nav>
@@ -243,7 +240,6 @@ export default function LandingPageContent() {
             <a href="#features-section">Features</a>
             <a href="#testimonials-section">Reviews</a>
             <a href="#faq-section">FAQ</a>
-            <a href="/admin" target="_blank">Admin Control</a>
           </div>
           <div className={styles.footerGuarantee}>
             <strong>Risk-Free Pledge</strong>

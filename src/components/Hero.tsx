@@ -23,7 +23,7 @@ export default function Hero({ onGetStarted }: HeroProps) {
         </p>
 
         <div className={styles.ctaContainer}>
-          <button onClick={onGetStarted} className={styles.ctaButton} aria-label="Start Website Setup & Pay">
+          <button onClick={onGetStarted} className={styles.ctaButton} aria-label="Start Website Setup & Lock Slot">
             Start Website Setup & Lock Slot
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" style={{ marginLeft: "8px" }}>
               <line x1="5" y1="12" x2="19" y2="12"></line>
