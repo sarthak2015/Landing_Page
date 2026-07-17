@@ -1,7 +1,15 @@
 import { NextResponse } from "next/server";
 import { createLead, findLeadByOrderId, listLeads, listNotifications, logNotification, updateLead } from "@/lib/leads";
+import { verifySessionToken } from "@/lib/adminAuth";
 
-export async function GET() {
+export async function GET(request: Request) {
+  const authHeader = request.headers.get("authorization");
+  const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+
+  if (!verifySessionToken(token)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const [leads, notifs] = await Promise.all([listLeads(), listNotifications()]);
     return NextResponse.json({ leads, notifications: notifs });

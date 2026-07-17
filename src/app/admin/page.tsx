@@ -63,7 +63,17 @@ export default function AdminDashboard() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/leads");
+      const token = sessionStorage.getItem("admin_session");
+      const res = await fetch("/api/leads", {
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
+      });
+
+      if (res.status === 401) {
+        handleLogout();
+        setError("Your session expired. Please log in again.");
+        return;
+      }
+
       if (!res.ok) throw new Error("Failed to fetch database records.");
       const data = await res.json();
       setLeads(data.leads || []);
