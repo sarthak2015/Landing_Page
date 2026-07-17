@@ -2,8 +2,6 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
-import dynamic from "next/dynamic";
-
 // Import CSS Modules
 import styles from "./LandingPageContent.module.css";
 
@@ -17,8 +15,6 @@ import PathAForm from "./PathAForm";
 import Scheduler from "./Scheduler";
 import ScrollReveal from "./ScrollReveal";
 
-// Lazy-load the Stripe modal to avoid SSR issues
-const StripePaymentModal = dynamic(() => import("./StripePaymentModal"), { ssr: false });
 
 export default function LandingPageContent() {
   const searchParams = useSearchParams();
@@ -32,10 +28,8 @@ export default function LandingPageContent() {
   const [paymentDetails, setPaymentDetails] = useState<any>(null);
   const [bookingDetails, setBookingDetails] = useState<any>(null);
 
-  // Stripe modal state
-  const [stripeClientSecret, setStripeClientSecret] = useState<string | null>(null);
-  const [stripeLeadId, setStripeLeadId] = useState<string | null>(null);
-  const [isCreatingIntent, setIsCreatingIntent] = useState(false);
+  // Stripe checkout state
+  const [isCreatingSession, setIsCreatingSession] = useState(false);
   const [paymentError, setPaymentError] = useState("");
 
   const [scrolled, setScrolled] = useState(false);
@@ -98,14 +92,14 @@ export default function LandingPageContent() {
     setTimeout(() => funnelRef.current?.scrollIntoView({ behavior: "smooth" }), 150);
   };
 
-  // Step 2: Handle Path A form submission -> open Stripe embedded modal
+  // Step 2: Handle Path A form submission -> create Stripe Checkout Session and redirect
   const handlePathAOrderCreated = async (formData: any) => {
     setSavedFormData(formData);
     setPaymentError("");
-    setIsCreatingIntent(true);
+    setIsCreatingSession(true);
 
     try {
-      const response = await fetch("/api/payment/create-intent", {
+      const response = await fetch("/api/payment/stripe-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ formData })
@@ -114,33 +108,19 @@ export default function LandingPageContent() {
       const data = await response.json();
 
       if (!response.ok || data.error) {
-        throw new Error(data.error || "Failed to initialise payment.");
+        throw new Error(data.error || "Failed to create checkout session.");
       }
 
-      setStripeClientSecret(data.clientSecret);
-      setStripeLeadId(data.leadId);
+      if (!data.url) {
+        throw new Error("No checkout URL returned from Stripe.");
+      }
+
+      window.location.href = data.url;
     } catch (err: any) {
-      console.error("Payment intent error:", err);
+      console.error("Checkout session error:", err);
       setPaymentError(err.message || "Payment setup failed. Please try again.");
-    } finally {
-      setIsCreatingIntent(false);
+      setIsCreatingSession(false);
     }
-  };
-
-  // Called after payment succeeds inside Stripe Elements modal
-  const handlePaymentSuccess = (leadId: string) => {
-    setStripeClientSecret(null);
-    setStripeLeadId(null);
-    setPaymentDetails({ orderId: leadId, paymentId: leadId, leadId });
-    setPathAStep("scheduler");
-    setTimeout(() => funnelRef.current?.scrollIntoView({ behavior: "smooth" }), 200);
-  };
-
-  // Close the Stripe modal without paying
-  const handleModalClose = () => {
-    setStripeClientSecret(null);
-    setStripeLeadId(null);
-    setPaymentError("Payment was not completed. Click \"Continue to payment\" to try again.");
   };
 
   // Step 3: Handle kickoff call booked
@@ -190,7 +170,7 @@ export default function LandingPageContent() {
                 onSubmitSuccess={handlePathAOrderCreated}
                 savedFormData={savedFormData}
                 setSavedFormData={setSavedFormData}
-                isStripeLoading={isCreatingIntent}
+                isStripeLoading={isCreatingSession}
               />
             )}
             {pathAStep === "scheduler" && (
@@ -276,16 +256,6 @@ export default function LandingPageContent() {
         </div>
       </footer>
 
-      {/* Stripe Embedded Payment Modal */}
-      {stripeClientSecret && stripeLeadId && (
-        <StripePaymentModal
-          clientSecret={stripeClientSecret}
-          leadId={stripeLeadId}
-          formData={savedFormData}
-          onSuccess={handlePaymentSuccess}
-          onClose={handleModalClose}
-        />
-      )}
     </div>
   );
 }

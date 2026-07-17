@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import styles from "./PathAForm.module.css";
 
 interface PathAFormProps {
-  onSubmitSuccess: (formData: any) => void;
+  onSubmitSuccess: (formData: any) => Promise<void>;
   savedFormData: any;
   setSavedFormData: (data: any) => void;
   isStripeLoading?: boolean;
@@ -269,13 +269,11 @@ export default function PathAForm({ onSubmitSuccess, savedFormData, setSavedForm
 
     setIsSubmitting(true);
     try {
-      // Pass the complete form data to parent, which will create the Stripe session
-      onSubmitSuccess(formData);
+      await onSubmitSuccess(formData);
     } catch (error: any) {
       console.error(error);
       setErrors({ form: error.message || "An unexpected error occurred. Please try again." });
     } finally {
-      // Always reset local submitting state — parent controls the Stripe loading overlay
       setIsSubmitting(false);
     }
   };
@@ -623,7 +621,7 @@ export default function PathAForm({ onSubmitSuccess, savedFormData, setSavedForm
               </button>
               
               <button type="submit" className={styles.btnSubmit} disabled={isSubmitting || isStripeLoading}>
-                {isStripeLoading ? "Redirecting to Stripe..." : isSubmitting ? "Preparing checkout..." : "Continue to payment — $99"}
+                {isStripeLoading ? "Redirecting to checkout..." : isSubmitting ? "Preparing checkout..." : "Continue to payment — $99"}
               </button>
             </div>
 
