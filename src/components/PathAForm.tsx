@@ -274,6 +274,8 @@ export default function PathAForm({ onSubmitSuccess, savedFormData, setSavedForm
     } catch (error: any) {
       console.error(error);
       setErrors({ form: error.message || "An unexpected error occurred. Please try again." });
+    } finally {
+      // Always reset local submitting state — parent controls the Stripe loading overlay
       setIsSubmitting(false);
     }
   };
