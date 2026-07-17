@@ -1,0 +1,207 @@
+.section {
+  padding: 80px 40px;
+  background: #ffffff;
+  border: 1.5px solid #000000;
+  border-radius: var(--radius-xl);
+  max-width: 1100px;
+  margin: 60px auto;
+  position: relative;
+  z-index: 1;
+  box-shadow: var(--shadow-sm);
+}
+
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pill {
+  background: #ffffff;
+  border: 1px solid #000000;
+  color: #000000;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 16px;
+  display: inline-block;
+}
+
+.title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin-bottom: 40px;
+  letter-spacing: -0.01em;
+}
+
+.cardContainer {
+  width: 100%;
+  perspective: 1000px;
+}
+
+@keyframes slideFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.testimonialCard {
+  background: #ffffff;
+  border: 1.5px solid #000000;
+  border-radius: var(--radius-lg);
+  padding: 48px;
+  text-align: left;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: slideFadeIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.testimonialCard:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.stars {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+}
+
+.quote {
+  font-size: 1.25rem;
+  line-height: 1.6;
+  color: #000000;
+  margin-bottom: 32px;
+  font-weight: 500;
+  position: relative;
+}
+
+.footerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #000000;
+  padding-top: 24px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  border: 1px solid #000000;
+  background: #000000;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #000000;
+}
+
+.role {
+  font-size: 0.85rem;
+  color: #000000;
+  margin-top: 2px;
+}
+
+/* Metric Display Box */
+.metricBox {
+  background: #ffffff;
+  border: 1.5px solid #000000;
+  padding: 10px 18px;
+  border-radius: var(--radius-md);
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+}
+
+.metricVal {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #000000;
+}
+
+.metricLabel {
+  font-size: 0.72rem;
+  color: #000000;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+}
+
+/* Indicator Dots */
+.dots {
+  display: flex;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-full);
+  background: #ffffff;
+  border: 1px solid #000000;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.15s ease;
+  outline: none;
+}
+
+.dotActive {
+  background: #000000;
+  box-shadow: none;
+}
+
+@media (max-width: 768px) {
+  .testimonialCard {
+    padding: 32px 24px;
+  }
+  
+  .quote {
+    font-size: 1.1rem;
+  }
+  
+  .footerRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .metricBox {
+    text-align: left;
+    width: 100%;
+  }
+  
+  .title {
+    font-size: 1.8rem;
+  }
+}

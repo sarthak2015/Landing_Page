@@ -1,0 +1,132 @@
+.faqSection {
+  padding: 80px 40px;
+  background: #ffffff;
+  border: 1.5px solid #000000;
+  border-radius: var(--radius-xl);
+  max-width: 1100px;
+  margin: 60px auto;
+  position: relative;
+  z-index: 1;
+  box-shadow: var(--shadow-sm);
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin-bottom: 16px;
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.item {
+  background: var(--panel-bg);
+  border: 1.5px solid var(--panel-border);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  overflow: hidden;
+  backdrop-filter: blur(5px);
+  box-shadow: var(--shadow-sm);
+}
+
+.item:hover {
+  border-color: #000000;
+  background: var(--panel-bg-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.questionRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.question {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.answerContainer {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.answer {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+  padding-top: 14px;
+}
+
+/* Open State */
+.item.open {
+  border-color: #000000;
+  background: #000000;
+  box-shadow: none;
+}
+
+.item.open .question {
+  color: #ffffff;
+}
+
+.item.open .answer {
+  color: #ffffff;
+}
+
+.item.open .arrow {
+  transform: rotate(180deg);
+  color: #ffffff;
+}
+
+.item.open .answerContainer {
+  max-height: 300px; /* Safe upper bound for text */
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 1.8rem;
+  }
+  
+  .question {
+    font-size: 1rem;
+  }
+  
+  .faqSection {
+    padding-bottom: 60px;
+  }
+}

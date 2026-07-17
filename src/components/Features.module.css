@@ -1,0 +1,155 @@
+.featuresSection {
+  padding: 80px 40px;
+  background: #ffffff;
+  border: 1.5px solid #000000;
+  border-radius: var(--radius-xl);
+  max-width: 1100px;
+  margin: 60px auto;
+  position: relative;
+  z-index: 1;
+  box-shadow: var(--shadow-sm);
+}
+
+.container {
+  width: 100%;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin-bottom: 16px;
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  max-width: 600px;
+  margin-bottom: 30px;
+}
+
+/* Toggle Switch - Pill Shape */
+.toggleContainer {
+  background: #ffffff;
+  border: 1.5px solid #000000;
+  padding: 4px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  gap: 4px;
+}
+
+.toggleBtn {
+  background: #ffffff;
+  border: none;
+  color: #000000;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 10px 24px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  outline: none;
+}
+
+.toggleBtn:hover {
+  opacity: 0.7;
+}
+
+.toggleBtn.activeA,
+.toggleBtn.activeB {
+  background: #000000;
+  color: #ffffff;
+}
+
+/* Grid Layout */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.card {
+  background: #ffffff;
+  border: 1.5px solid #000000;
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: #000000;
+  border: 1px solid #000000;
+  color: #ffffff;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.featTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #000000;
+}
+
+.featDesc {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #000000;
+}
+
+/* Hover effects */
+.cardA:hover,
+.cardB:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.cardA:hover .icon,
+.cardB:hover .icon {
+  background: #ffffff;
+  border-color: #000000;
+  color: #000000;
+}
+
+@media (max-width: 992px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .title {
+    font-size: 1.8rem;
+  }
+  
+  .featuresSection {
+    padding: 60px 20px;
+  }
+}

@@ -1,0 +1,346 @@
+.adminPage {
+  min-height: 100vh;
+  background-color: #ffffff;
+  color: #000000;
+  padding-bottom: 60px;
+}
+
+/* Header styling */
+.header {
+  border-bottom: 2px solid #000000;
+  background: #ffffff;
+  padding: 24px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.headerContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  font-size: 0.85rem;
+  font-weight: 400;
+  margin-top: 4px;
+}
+
+.headerBtnGroup {
+  display: flex;
+  gap: 12px;
+}
+
+.refreshBtn {
+  background: #000000;
+  border: 1px solid #000000;
+  border-radius: 0px;
+  padding: 10px 18px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.refreshBtn:hover {
+  background: #ffffff;
+  color: #000000;
+}
+
+.logoutBtn {
+  background: #ffffff;
+  border: 1px solid #000000;
+  border-radius: 0px;
+  padding: 10px 18px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #000000;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.logoutBtn:hover {
+  background: #000000;
+  color: #ffffff;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 40px auto 0 auto;
+  padding: 0 20px;
+}
+
+.errorBanner {
+  border: 2px solid #000000;
+  color: #000000;
+  background: #ffffff;
+  padding: 16px;
+  font-weight: 700;
+  margin-bottom: 30px;
+}
+
+.loader {
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding: 80px 0;
+}
+
+/* Two-Column Layout */
+.dashboardLayout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+}
+
+.columnHeader {
+  font-size: 1.2rem;
+  font-weight: 800;
+  margin-bottom: 24px;
+  color: #000000;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid #000000;
+  padding-bottom: 8px;
+}
+
+.emptyState {
+  background: #ffffff;
+  border: 1px dashed #000000;
+  padding: 40px 20px;
+  text-align: center;
+  color: #000000;
+  font-weight: 500;
+}
+
+/* Card details list */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.leadCard {
+  background: #ffffff;
+  border: 1px solid #000000;
+  padding: 24px;
+  transition: outline 0.15s ease;
+}
+
+.leadCard:hover {
+  outline: 2px solid #000000;
+}
+
+.cardHeaderRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.statusBadgePaid {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  background: #000000;
+  color: #ffffff;
+  border: 1px solid #000000;
+}
+
+.statusBadgePending {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  background: #ffffff;
+  color: #000000;
+  border: 1px solid #000000;
+}
+
+.timestamp {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.cardMain {
+  margin-bottom: 16px;
+}
+
+.leadName {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.leadContact {
+  font-size: 0.85rem;
+  font-weight: 400;
+}
+
+.leadBiz {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+.leadDetails {
+  background: #ffffff;
+  border-top: 1px solid #000000;
+  padding-top: 16px;
+  font-size: 0.88rem;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.noteField {
+  font-style: italic;
+  margin-top: 4px;
+  border-left: 2px solid #000000;
+  padding-left: 10px;
+}
+
+.paymentInfo {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dotted #000000;
+  font-weight: 700;
+}
+
+.bookingInfo {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  border: 1px solid #000000;
+  padding: 8px 12px;
+  text-align: center;
+  margin-top: 4px;
+}
+
+.bookingPending {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  border: 1px dashed #000000;
+  padding: 8px 12px;
+  text-align: center;
+  margin-top: 4px;
+}
+
+.actionRow {
+  margin-top: 12px;
+  display: flex;
+}
+
+.paymentLinkBtn {
+  background: #ffffff;
+  border: 1px solid #000000;
+  color: #000000;
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.15s ease;
+}
+
+.paymentLinkBtn:hover {
+  background: #000000;
+  color: #ffffff;
+}
+
+/* Secure Login page elements */
+.loginPage {
+  min-height: 100vh;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.loginCard {
+  background: #ffffff;
+  border: 2px solid #000000;
+  padding: 40px;
+  max-width: 420px;
+  width: 100%;
+}
+
+.loginHeader {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.loginHeader h1 {
+  font-size: 2rem;
+  font-weight: 900;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.loginHeader p {
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.loginForm {
+  display: flex;
+  flex-direction: column;
+}
+
+.authError {
+  background: #ffffff;
+  border: 2px solid #000000;
+  color: #000000;
+  padding: 12px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.loginBtn {
+  background: #000000;
+  color: #ffffff;
+  border: 1px solid #000000;
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.loginBtn:hover {
+  background: #ffffff;
+  color: #000000;
+}
+
+.loginBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 900px) {
+  .dashboardLayout {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}

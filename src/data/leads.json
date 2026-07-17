@@ -1,0 +1,78 @@
+[
+  {
+    "id": "lead_2kzfq2cvw",
+    "type": "build_ready",
+    "status": "paid",
+    "formData": {
+      "name": "Dhruv Pathak",
+      "businessName": "Qevn",
+      "email": "dhruvpathak1001@gmail.com",
+      "phone": "6354666048",
+      "countryCode": "+91",
+      "hasWebsite": "No",
+      "websiteUrl": "",
+      "industry": "SaaS / Tech Startup",
+      "customIndustry": "",
+      "goals": [
+        "booking"
+      ],
+      "domain": "",
+      "notes": "hey world "
+    },
+    "payment": {
+      "orderId": "order_mock_7pvk0s3k51e",
+      "paymentId": "pay_mock_nsq8uabf5",
+      "amount": 99,
+      "currency": "USD",
+      "verified": true,
+      "method": "sandbox_simulated"
+    },
+    "booking": null,
+    "createdAt": "2026-07-17T06:18:37.724Z"
+  },
+  {
+    "id": "lead_3i24g7wrk",
+    "type": "build_ready",
+    "status": "scheduled",
+    "formData": {
+      "name": "Dhruv Pathak",
+      "businessName": "youpp",
+      "email": "dhruvpathak1001@gmail.com",
+      "phone": "1234567890",
+      "countryCode": "+91",
+      "websiteType": "Landing Page",
+      "selectedPages": [
+        "Home",
+        "About Us",
+        "Services",
+        "Testimonials",
+        "Gallery"
+      ],
+      "selectedFeatures": [
+        "Contact Form",
+        "Call Now Button",
+        "Social Media Links"
+      ],
+      "hasDomain": "No",
+      "domainName": "",
+      "hasLogo": "No",
+      "contentReady": "No, I need help",
+      "referenceWebsites": "",
+      "additionalInfo": ""
+    },
+    "payment": {
+      "orderId": "order_mock_ee679bqaczg",
+      "paymentId": "pay_mock_rzy2ofevk",
+      "amount": 99,
+      "currency": "USD",
+      "verified": true,
+      "method": "sandbox_simulated"
+    },
+    "booking": {
+      "date": "2026-07-22",
+      "time": "11:30 AM",
+      "formattedDateTime": "Wed, Jul 22 at 11:30 AM"
+    },
+    "createdAt": "2026-07-17T06:58:03.353Z"
+  }
+]

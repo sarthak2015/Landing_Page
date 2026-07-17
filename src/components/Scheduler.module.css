@@ -1,0 +1,263 @@
+.container {
+  background: #ffffff;
+  border: 1.5px solid #000000;
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  max-width: 750px;
+  width: 100%;
+  margin: 0 auto;
+  box-shadow: var(--shadow-lg);
+}
+
+.successBadge {
+  background: #ffffff;
+  border: 1.5px solid #000000;
+  color: #000000;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  text-transform: uppercase;
+}
+
+.title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
+  color: #000000;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: #000000;
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+.errorAlert {
+  background: #ffffff;
+  border: 1.5px solid #000000;
+  color: #000000;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 24px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+/* Date & Time Selection Grid */
+.bookingGrid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 32px;
+  margin-bottom: 30px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #000000;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Date List */
+.dateList {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.dateBtn {
+  background: #ffffff;
+  border: 1px solid #000000;
+  border-radius: var(--radius-md);
+  padding: 14px 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.15s ease;
+  outline: none;
+}
+
+.dateBtn:hover {
+  background: #ffffff;
+  border-color: #000000;
+  box-shadow: var(--shadow-sm);
+}
+
+.dateDay {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #000000;
+}
+
+.dateNum {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #000000;
+  margin: 4px 0;
+}
+
+.dateMonth {
+  font-size: 0.75rem;
+  color: #000000;
+}
+
+.dateBtn.active {
+  border-color: #000000;
+  background: #000000;
+  box-shadow: none;
+}
+
+.dateBtn.active .dateDay,
+.dateBtn.active .dateMonth,
+.dateBtn.active .dateNum {
+  color: #ffffff;
+}
+
+/* Times grid */
+.placeholderState {
+  background: #ffffff;
+  border: 1px dashed #000000;
+  border-radius: var(--radius-md);
+  padding: 40px 20px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.timeGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.timeBtn {
+  background: #ffffff;
+  border: 1px solid #000000;
+  border-radius: var(--radius-md);
+  padding: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #000000;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  outline: none;
+}
+
+.timeBtn:hover {
+  background: #ffffff;
+  border-color: #000000;
+  box-shadow: var(--shadow-sm);
+}
+
+.timeBtn.active {
+  border-color: #000000;
+  background: #000000;
+  color: #ffffff;
+  box-shadow: none;
+}
+
+/* Booking summary panel */
+.summaryPanel {
+  background: #ffffff;
+  border: 1px solid #000000;
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  margin-bottom: 24px;
+}
+
+.summaryText {
+  font-size: 0.95rem;
+  color: #000000;
+}
+
+.prefillInfo {
+  font-size: 0.8rem;
+  color: #000000;
+  margin-top: 4px;
+}
+
+.prefillInfo span {
+  color: #000000;
+  font-weight: 700;
+}
+
+.confirmBtn {
+  background: #000000;
+  color: #ffffff;
+  border: 1px solid #000000;
+  border-radius: var(--radius-lg);
+  padding: 14px 28px;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  width: 100%;
+  box-shadow: none;
+}
+
+.confirmBtn:hover {
+  background: #ffffff;
+  color: #000000;
+  border-color: #000000;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.confirmBtn:disabled {
+  background: #ffffff;
+  color: #000000;
+  border: 1px solid #000000;
+  cursor: not-allowed;
+  opacity: 0.3;
+}
+
+.timeZoneNote {
+  font-size: 0.78rem;
+  color: #000000;
+  text-align: center;
+  margin-top: 16px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 24px;
+  }
+  
+  .bookingGrid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  
+  .dateList {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .dateList {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
