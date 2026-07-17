@@ -54,8 +54,16 @@ export async function POST(request: Request) {
     // Generate a unique lead ID
     const leadId = `lead_${Math.random().toString(36).substring(2, 11)}`;
 
-    // Save lead details as pending in leads.json
-    savePendingLead(leadId, formData);
+    // Save lead details as pending in leads.json.
+    // This is best-effort local logging only — on serverless hosts (e.g. Vercel)
+    // the filesystem is read-only, so this write fails there. It must never
+    // block Stripe session creation; the full formData already rides in
+    // session metadata below so checkout can proceed without it.
+    try {
+      savePendingLead(leadId, formData);
+    } catch (e) {
+      console.error("Failed to persist pending lead (non-fatal):", e);
+    }
 
     // Create a Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
