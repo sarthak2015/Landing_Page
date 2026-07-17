@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
+import dynamic from "next/dynamic";
 
 // Import CSS Modules
 import styles from "./LandingPageContent.module.css";
@@ -16,12 +17,14 @@ import PathAForm from "./PathAForm";
 import Scheduler from "./Scheduler";
 import ScrollReveal from "./ScrollReveal";
 
+// Lazy-load the Stripe modal to avoid SSR issues
+const StripePaymentModal = dynamic(() => import("./StripePaymentModal"), { ssr: false });
+
 export default function LandingPageContent() {
   const searchParams = useSearchParams();
   const funnelRef = useRef<HTMLDivElement>(null);
 
   // Core funnel state
-  const [selectedPath, setSelectedPath] = useState<"A">("A");
   const [pathAStep, setPathAStep] = useState<"form" | "scheduler" | "confirmed">("form");
 
   // Lead details caching
@@ -29,16 +32,16 @@ export default function LandingPageContent() {
   const [paymentDetails, setPaymentDetails] = useState<any>(null);
   const [bookingDetails, setBookingDetails] = useState<any>(null);
 
-  // Stripe checkout state
-  const [isStripeLoading, setIsStripeLoading] = useState(false);
+  // Stripe modal state
+  const [stripeClientSecret, setStripeClientSecret] = useState<string | null>(null);
+  const [stripeLeadId, setStripeLeadId] = useState<string | null>(null);
+  const [isCreatingIntent, setIsCreatingIntent] = useState(false);
   const [paymentError, setPaymentError] = useState("");
 
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -49,9 +52,6 @@ export default function LandingPageContent() {
     const prefill = searchParams.get("prefill");
 
     if (hasPath === "A" && prefill === "true") {
-      setSelectedPath("A");
-      setPathAStep("form");
-
       const prefillData = {
         name: searchParams.get("name") || "",
         email: searchParams.get("email") || "",
@@ -61,75 +61,51 @@ export default function LandingPageContent() {
         budget: searchParams.get("budget") || "",
         hasWebsite: "No"
       };
-
       setSavedFormData(prefillData);
-
-      setTimeout(() => {
-        funnelRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, 300);
+      setTimeout(() => funnelRef.current?.scrollIntoView({ behavior: "smooth" }), 300);
     }
   }, [searchParams]);
 
-  // Handle Stripe Checkout success redirect: ?payment_success=true&lead_id=xxx
+  // Handle Stripe return redirect (for redirect-based payment methods like bank transfers)
   useEffect(() => {
     const paymentSuccess = searchParams.get("payment_success");
     const leadId = searchParams.get("lead_id");
-    const sessionId = searchParams.get("session_id");
     const paymentCancelled = searchParams.get("payment_cancelled");
 
     if (paymentSuccess === "true" && leadId) {
-      // Fetch the saved lead from the database to restore form data
       fetch(`/api/payment/lead-data?lead_id=${leadId}`)
         .then((res) => res.json())
         .then((data) => {
-          if (data.lead) {
-            setSavedFormData(data.lead.formData || {});
-          }
-          setPaymentDetails({
-            orderId: leadId,
-            paymentId: sessionId || leadId,
-            leadId
-          });
+          if (data.lead) setSavedFormData(data.lead.formData || {});
+          setPaymentDetails({ orderId: leadId, paymentId: leadId, leadId });
         })
         .catch(() => {
-          // Even if fetch fails, store the IDs so scheduler can save booking
-          setPaymentDetails({
-            orderId: leadId,
-            paymentId: sessionId || leadId,
-            leadId
-          });
+          setPaymentDetails({ orderId: leadId, paymentId: leadId, leadId });
         });
-
       setPathAStep("scheduler");
-      setTimeout(() => {
-        funnelRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, 300);
+      setTimeout(() => funnelRef.current?.scrollIntoView({ behavior: "smooth" }), 300);
     }
 
     if (paymentCancelled === "true") {
-      setPaymentError("Payment was cancelled. Your details are saved — click \"Complete Setup & Pay\" to try again.");
-      setTimeout(() => {
-        funnelRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, 300);
+      setPaymentError("Payment was cancelled. Click \"Continue to payment\" to try again.");
+      setTimeout(() => funnelRef.current?.scrollIntoView({ behavior: "smooth" }), 300);
     }
   }, [searchParams]);
 
   // Handler for main Hero CTA
   const handleGetStarted = () => {
     setPathAStep("form");
-    setTimeout(() => {
-      funnelRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 150);
+    setTimeout(() => funnelRef.current?.scrollIntoView({ behavior: "smooth" }), 150);
   };
 
-  // Step 2: Handle Path A form submission -> redirect to Stripe Checkout
+  // Step 2: Handle Path A form submission -> open Stripe embedded modal
   const handlePathAOrderCreated = async (formData: any) => {
     setSavedFormData(formData);
     setPaymentError("");
-    setIsStripeLoading(true);
+    setIsCreatingIntent(true);
 
     try {
-      const response = await fetch("/api/payment/stripe-session", {
+      const response = await fetch("/api/payment/create-intent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ formData })
@@ -138,23 +114,36 @@ export default function LandingPageContent() {
       const data = await response.json();
 
       if (!response.ok || data.error) {
-        throw new Error(data.error || "Failed to create checkout session.");
+        throw new Error(data.error || "Failed to initialise payment.");
       }
 
-      // Redirect the browser to Stripe hosted checkout page
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error("No redirect URL received from Stripe.");
-      }
+      setStripeClientSecret(data.clientSecret);
+      setStripeLeadId(data.leadId);
     } catch (err: any) {
-      console.error("Stripe checkout error:", err);
+      console.error("Payment intent error:", err);
       setPaymentError(err.message || "Payment setup failed. Please try again.");
-      setIsStripeLoading(false);
+    } finally {
+      setIsCreatingIntent(false);
     }
   };
 
-  // Step 3: Handle Path A Kickoff Scheduled Complete
+  // Called after payment succeeds inside Stripe Elements modal
+  const handlePaymentSuccess = (leadId: string) => {
+    setStripeClientSecret(null);
+    setStripeLeadId(null);
+    setPaymentDetails({ orderId: leadId, paymentId: leadId, leadId });
+    setPathAStep("scheduler");
+    setTimeout(() => funnelRef.current?.scrollIntoView({ behavior: "smooth" }), 200);
+  };
+
+  // Close the Stripe modal without paying
+  const handleModalClose = () => {
+    setStripeClientSecret(null);
+    setStripeLeadId(null);
+    setPaymentError("Payment was not completed. Click \"Continue to payment\" to try again.");
+  };
+
+  // Step 3: Handle kickoff call booked
   const handleBookingComplete = (details: any) => {
     setBookingDetails(details);
     setPathAStep("confirmed");
@@ -189,23 +178,19 @@ export default function LandingPageContent() {
       {/* Active Form funnel Workspace */}
       <div ref={funnelRef} className={styles.funnelWorkspace} id="funnel-workspace">
         <ScrollReveal className={styles.workspaceContainer}>
-          {/* Error alerts if payments failed */}
           {paymentError && (
             <div className={styles.paymentErrorAlert}>
-              <div>
-                <strong>Payment Alert:</strong> {paymentError}
-              </div>
+              <strong>Payment Alert:</strong> {paymentError}
             </div>
           )}
 
-          {/* PATH A VIEWS */}
           <div className="animate-fade-in">
             {pathAStep === "form" && (
               <PathAForm
                 onSubmitSuccess={handlePathAOrderCreated}
                 savedFormData={savedFormData}
                 setSavedFormData={setSavedFormData}
-                isStripeLoading={isStripeLoading}
+                isStripeLoading={isCreatingIntent}
               />
             )}
             {pathAStep === "scheduler" && (
@@ -229,7 +214,6 @@ export default function LandingPageContent() {
                 <p className={styles.confSubtitle}>
                   Your build slot is locked. Here is a summary of your kickoff details and how to prepare:
                 </p>
-
                 <div className={styles.summaryList}>
                   <div className={styles.summaryItem}>
                     <strong>Kickoff Receipt:</strong> $99.00 USD (Verified ✓)
@@ -238,7 +222,6 @@ export default function LandingPageContent() {
                     <strong>Scheduled Date:</strong> {bookingDetails?.formattedDateTime} (Google Calendar invite sent)
                   </div>
                 </div>
-
                 <div className={styles.prepPanel}>
                   <h3>Prepare for Kickoff:</h3>
                   <ul>
@@ -248,7 +231,6 @@ export default function LandingPageContent() {
                     <li>High-res images or portfolio assets you want embedded.</li>
                   </ul>
                 </div>
-
                 <div className={styles.slaPanel}>
                   <strong>Our Launch SLA Guarantee:</strong> We will build, optimize, and launch your draft website within 48 hours of our kickoff call.
                 </div>
@@ -271,9 +253,7 @@ export default function LandingPageContent() {
       <footer className={styles.footer}>
         <ScrollReveal className={styles.footerContainer}>
           <div className={styles.footerBrand}>
-            <div className={styles.logo}>
-              <span>Go-Speed</span>
-            </div>
+            <div className={styles.logo}><span>Go-Speed</span></div>
             <p className={styles.footerDesc}>
               Premium, modern websites designed and developed in 48 hours for $99. Risk-free slot reservations.
             </p>
@@ -296,28 +276,15 @@ export default function LandingPageContent() {
         </div>
       </footer>
 
-      {/* Stripe loading overlay - shown while redirecting to Stripe Checkout */}
-      {isStripeLoading && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.stripeLoadingCard}>
-            <div className={styles.stripeLoadingIcon}>
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                <polyline points="9 11 11 13 15 9"/>
-              </svg>
-            </div>
-            <div className={styles.stripeLoadingSpinner}></div>
-            <div className={styles.stripeLoadingTitle}>Redirecting to Secure Checkout</div>
-            <div className={styles.stripeLoadingSubtitle}>
-              You are being redirected to Stripe&apos;s encrypted payment page. Please do not close this window.
-            </div>
-            <div className={styles.stripeLoadingBadges}>
-              <span>🔒 SSL Encrypted</span>
-              <span>✓ Powered by Stripe</span>
-              <span>↩ Returns to this page</span>
-            </div>
-          </div>
-        </div>
+      {/* Stripe Embedded Payment Modal */}
+      {stripeClientSecret && stripeLeadId && (
+        <StripePaymentModal
+          clientSecret={stripeClientSecret}
+          leadId={stripeLeadId}
+          formData={savedFormData}
+          onSuccess={handlePaymentSuccess}
+          onClose={handleModalClose}
+        />
       )}
     </div>
   );
