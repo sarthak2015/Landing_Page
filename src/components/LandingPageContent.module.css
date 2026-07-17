@@ -899,3 +899,93 @@
     stroke-dashoffset: 0 !important;
   }
 }
+
+/* ── Stripe Redirect Loading Overlay ────────────────────── */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+.stripeLoadingCard {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 48px 40px;
+  max-width: 420px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  animation: fadeScaleIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.stripeLoadingIcon {
+  width: 64px;
+  height: 64px;
+  background: #000000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+
+.stripeLoadingSpinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e5e5e5;
+  border-top-color: #000000;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.stripeLoadingTitle {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #000000;
+  letter-spacing: -0.02em;
+}
+
+.stripeLoadingSubtitle {
+  font-size: 0.82rem;
+  color: #555555;
+  line-height: 1.6;
+  max-width: 300px;
+}
+
+.stripeLoadingBadges {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.stripeLoadingBadges span {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #333333;
+  background: #f5f5f5;
+  padding: 4px 10px;
+  border-radius: 100px;
+  border: 1px solid #e5e5e5;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeScaleIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+

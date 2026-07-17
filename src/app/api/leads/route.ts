@@ -119,8 +119,8 @@ export async function POST(request: Request) {
         leads = JSON.parse(fs.readFileSync(LEADS_FILE_PATH, "utf8") || "[]");
       }
 
-      // Find the paid order matching this order ID
-      let leadIndex = leads.findIndex((l: any) => l.payment?.orderId === orderId);
+      // Find the paid order matching this order ID or direct Lead ID
+      let leadIndex = leads.findIndex((l: any) => l.payment?.orderId === orderId || l.id === orderId || l.id === body.leadId);
 
       if (leadIndex === -1) {
         // If for some reason the lead record wasn't stored (e.g. direct sandbox page load), 

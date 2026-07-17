@@ -4,9 +4,10 @@ import React, { useState, useEffect } from "react";
 import styles from "./PathAForm.module.css";
 
 interface PathAFormProps {
-  onSubmitSuccess: (formData: any, orderId: string, amount: number) => void;
+  onSubmitSuccess: (formData: any) => void;
   savedFormData: any;
   setSavedFormData: (data: any) => void;
+  isStripeLoading?: boolean;
 }
 
 interface PathAFormData {
@@ -67,7 +68,7 @@ const FEATURE_OPTIONS = [
   "Other"
 ];
 
-export default function PathAForm({ onSubmitSuccess, savedFormData, setSavedFormData }: PathAFormProps) {
+export default function PathAForm({ onSubmitSuccess, savedFormData, setSavedFormData, isStripeLoading = false }: PathAFormProps) {
   const [step, setStep] = useState(1);
   
   const [formData, setFormData] = useState<PathAFormData>({
@@ -268,29 +269,11 @@ export default function PathAForm({ onSubmitSuccess, savedFormData, setSavedForm
 
     setIsSubmitting(true);
     try {
-      // Create Razorpay Order server side
-      const response = await fetch("/api/payment/order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          phone: `${formData.countryCode}${formData.phone}`
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to create checkout order");
-      }
-
-      const order = await response.json();
-      
-      // Trigger checkout standard payment
-      onSubmitSuccess(formData, order.id, order.amount);
+      // Pass the complete form data to parent, which will create the Stripe session
+      onSubmitSuccess(formData);
     } catch (error: any) {
       console.error(error);
       setErrors({ form: error.message || "An unexpected error occurred. Please try again." });
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -637,8 +620,8 @@ export default function PathAForm({ onSubmitSuccess, savedFormData, setSavedForm
                 Back
               </button>
               
-              <button type="submit" className={styles.btnSubmit} disabled={isSubmitting}>
-                {isSubmitting ? "Generating Slot..." : "Continue to payment — $99"}
+              <button type="submit" className={styles.btnSubmit} disabled={isSubmitting || isStripeLoading}>
+                {isStripeLoading ? "Redirecting to Stripe..." : isSubmitting ? "Preparing checkout..." : "Continue to payment — $99"}
               </button>
             </div>
 
