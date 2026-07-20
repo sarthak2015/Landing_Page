@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 // Import CSS Modules
 import styles from "./LandingPageContent.module.css";
 
@@ -248,6 +249,11 @@ export default function LandingPageContent() {
         </ScrollReveal>
         <div className={styles.footerBottom}>
           <span>© {new Date().getFullYear()} Go-Speed. All rights reserved.</span>
+          <span className={styles.footerLegalLinks}>
+            <Link href="/privacy">Privacy Policy</Link>
+            <span className={styles.footerLegalDivider}>•</span>
+            <Link href="/terms">Terms of Service</Link>
+          </span>
           <span>Designed with high-speed performance and conversion benchmarks.</span>
         </div>
       </footer>

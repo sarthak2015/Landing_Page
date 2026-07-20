@@ -18,7 +18,7 @@ const REVIEWS = [
     avatar: "DB"
   },
   {
-    quote: "I went with Path B (Explore first) because we have custom inventory databases. The call was completely pressure-free. The developer mapped out our options, hostings, and gave us a direct checklist. We ended up ordering a custom build. Highly recommended!",
+    quote: "We have custom inventory databases, so I wanted to talk it through before committing. The kickoff call was completely pressure-free — the developer mapped out our options, hosting, and gave us a direct checklist. We ended up placing our order right after the call. Highly recommended!",
     author: "Kenji Sato",
     role: "Co-Founder, Sato Woodcraft",
     stat: "Zero Pressure Strategy Call",
@@ -62,7 +62,7 @@ export default function Testimonial() {
               
               <div className={styles.metricBox}>
                 <span className={styles.metricVal}>{REVIEWS[activeIndex].stat}</span>
-                <span className={styles.metricLabel}>Verified Result</span>
+                <span className={styles.metricLabel}>Illustrative Example</span>
               </div>
             </div>
           </div>

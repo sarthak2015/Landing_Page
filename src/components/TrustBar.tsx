@@ -14,8 +14,8 @@ export default function TrustBar() {
             </svg>
           </div>
           <div className={styles.info}>
-            <span className={styles.value}>4.9/5 Rating</span>
-            <span className={styles.label}>from 240+ business owners</span>
+            <span className={styles.value}>Flat $99 Pricing</span>
+            <span className={styles.label}>no hidden fees or upsells</span>
           </div>
         </ScrollReveal>
 

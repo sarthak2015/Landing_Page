@@ -386,6 +386,27 @@
   gap: 16px;
 }
 
+.footerLegalLinks {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.footerLegalLinks a {
+  color: #ffffff;
+  text-decoration: none;
+  opacity: 0.85;
+}
+
+.footerLegalLinks a:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+.footerLegalDivider {
+  opacity: 0.5;
+}
+
 /* Razorpay Sandbox Simulation modal overlay */
 .modalOverlay {
   position: fixed;
