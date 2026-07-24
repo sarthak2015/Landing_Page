@@ -84,7 +84,7 @@ export default function AdminDashboard() {
     }
   };
 
-  const generatePaymentLink = (lead: any) => {
+  const generatePrefillLink = (lead: any) => {
     const origin = window.location.origin;
     const query = new URLSearchParams({
       path: "A",
@@ -226,11 +226,6 @@ export default function AdminDashboard() {
                         {lead.formData.referenceWebsites && <p><strong>References:</strong> {lead.formData.referenceWebsites}</p>}
                         {lead.formData.additionalInfo && <p className={styles.noteField}><strong>Notes:</strong> "{lead.formData.additionalInfo}"</p>}
                         
-                        {lead.payment && (
-                          <div className={styles.paymentInfo}>
-                            Paid $99 via {lead.payment.method} (Order: {lead.payment.orderId.substring(0, 12)}...)
-                          </div>
-                        )}
                         {lead.booking ? (
                           <div className={styles.bookingInfo}>
                             Kickoff Scheduled: {lead.booking.formattedDateTime}
@@ -284,8 +279,8 @@ export default function AdminDashboard() {
                         {lead.formData.questions && <p className={styles.noteField}><strong>Questions:</strong> "{lead.formData.questions}"</p>}
                         
                         <div className={styles.actionRow}>
-                          <button onClick={() => generatePaymentLink(lead)} className={styles.paymentLinkBtn}>
-                            {copiedLinkMap[lead.id] ? "Copied Link" : "Copy Paid Checkout Shortcut"}
+                          <button onClick={() => generatePrefillLink(lead)} className={styles.paymentLinkBtn}>
+                            {copiedLinkMap[lead.id] ? "Copied Link" : "Copy Form Prefill Link"}
                           </button>
                         </div>
                       </div>

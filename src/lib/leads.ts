@@ -120,7 +120,7 @@ export interface Notification {
 export async function logNotification(
   title: string,
   message: string,
-  type: "explore" | "booking" | "payment"
+  type: "explore" | "booking" | "submit"
 ): Promise<void> {
   const { error } = await supabaseAdmin.from("notifications").insert({
     id: `notif_${Math.random().toString(36).substring(2, 11)}`,

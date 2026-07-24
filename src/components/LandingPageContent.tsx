@@ -1,12 +1,9 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-// Import CSS Modules
 import styles from "./LandingPageContent.module.css";
 
-// Import Subcomponents
 import Hero from "./Hero";
 import TrustBar from "./TrustBar";
 import Features from "./Features";
@@ -18,20 +15,13 @@ import ScrollReveal from "./ScrollReveal";
 
 
 export default function LandingPageContent() {
-  const searchParams = useSearchParams();
   const funnelRef = useRef<HTMLDivElement>(null);
 
-  // Core funnel state
   const [pathAStep, setPathAStep] = useState<"form" | "scheduler" | "confirmed">("form");
-
-  // Lead details caching
   const [savedFormData, setSavedFormData] = useState<any>({});
-  const [paymentDetails, setPaymentDetails] = useState<any>(null);
+  const [leadId, setLeadId] = useState<string>("");
   const [bookingDetails, setBookingDetails] = useState<any>(null);
-
-  // Stripe checkout state
-  const [isCreatingSession, setIsCreatingSession] = useState(false);
-  const [paymentError, setPaymentError] = useState("");
+  const [submitError, setSubmitError] = useState("");
 
   const [scrolled, setScrolled] = useState(false);
 
@@ -41,90 +31,34 @@ export default function LandingPageContent() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Check for URL query pre-fills (Admin panel link redirects)
-  useEffect(() => {
-    const hasPath = searchParams.get("path");
-    const prefill = searchParams.get("prefill");
-
-    if (hasPath === "A" && prefill === "true") {
-      const prefillData = {
-        name: searchParams.get("name") || "",
-        email: searchParams.get("email") || "",
-        phone: searchParams.get("phone") || "",
-        businessName: searchParams.get("business") || "",
-        industry: searchParams.get("industry") || "",
-        budget: searchParams.get("budget") || "",
-        hasWebsite: "No"
-      };
-      setSavedFormData(prefillData);
-      setTimeout(() => funnelRef.current?.scrollIntoView({ behavior: "smooth" }), 300);
-    }
-  }, [searchParams]);
-
-  // Handle Stripe return redirect (for redirect-based payment methods like bank transfers)
-  useEffect(() => {
-    const paymentSuccess = searchParams.get("payment_success");
-    const leadId = searchParams.get("lead_id");
-    const paymentCancelled = searchParams.get("payment_cancelled");
-
-    if (paymentSuccess === "true" && leadId) {
-      fetch(`/api/payment/lead-data?lead_id=${leadId}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.lead) setSavedFormData(data.lead.formData || {});
-          setPaymentDetails({ orderId: leadId, paymentId: leadId, leadId });
-        })
-        .catch(() => {
-          setPaymentDetails({ orderId: leadId, paymentId: leadId, leadId });
-        });
-      setPathAStep("scheduler");
-      setTimeout(() => funnelRef.current?.scrollIntoView({ behavior: "smooth" }), 300);
-    }
-
-    if (paymentCancelled === "true") {
-      setPaymentError("Payment was cancelled. Click \"Continue to payment\" to try again.");
-      setTimeout(() => funnelRef.current?.scrollIntoView({ behavior: "smooth" }), 300);
-    }
-  }, [searchParams]);
-
-  // Handler for main Hero CTA
   const handleGetStarted = () => {
     setPathAStep("form");
     setTimeout(() => funnelRef.current?.scrollIntoView({ behavior: "smooth" }), 150);
   };
 
-  // Step 2: Handle Path A form submission -> create Stripe Checkout Session and redirect
-  const handlePathAOrderCreated = async (formData: any) => {
+  // Form submitted → save lead → show Calendly
+  const handleFormSubmit = async (formData: any) => {
     setSavedFormData(formData);
-    setPaymentError("");
-    setIsCreatingSession(true);
+    setSubmitError("");
 
-    try {
-      const response = await fetch("/api/payment/stripe-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ formData })
-      });
+    const response = await fetch("/api/leads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "submit", formData })
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (!response.ok || data.error) {
-        throw new Error(data.error || "Failed to create checkout session.");
-      }
-
-      if (!data.url) {
-        throw new Error("No checkout URL returned from Stripe.");
-      }
-
-      window.location.href = data.url;
-    } catch (err: any) {
-      console.error("Checkout session error:", err);
-      setPaymentError(err.message || "Payment setup failed. Please try again.");
-      setIsCreatingSession(false);
+    if (!response.ok || data.error) {
+      throw new Error(data.error || "Failed to save your details. Please try again.");
     }
+
+    setLeadId(data.lead.id);
+    setPathAStep("scheduler");
+    setTimeout(() => funnelRef.current?.scrollIntoView({ behavior: "smooth" }), 150);
   };
 
-  // Step 3: Handle kickoff call booked
+  // Calendly booking complete → confirmed state
   const handleBookingComplete = (details: any) => {
     setBookingDetails(details);
     setPathAStep("confirmed");
@@ -156,26 +90,24 @@ export default function LandingPageContent() {
       {/* Active Form funnel Workspace */}
       <div ref={funnelRef} className={styles.funnelWorkspace} id="funnel-workspace">
         <ScrollReveal className={styles.workspaceContainer}>
-          {paymentError && (
+          {submitError && (
             <div className={styles.paymentErrorAlert}>
-              <strong>Payment Alert:</strong> {paymentError}
+              <strong>Error:</strong> {submitError}
             </div>
           )}
 
           <div className="animate-fade-in">
             {pathAStep === "form" && (
               <PathAForm
-                onSubmitSuccess={handlePathAOrderCreated}
+                onSubmitSuccess={handleFormSubmit}
                 savedFormData={savedFormData}
                 setSavedFormData={setSavedFormData}
-                isStripeLoading={isCreatingSession}
               />
             )}
             {pathAStep === "scheduler" && (
               <Scheduler
                 formData={savedFormData}
-                paymentId={paymentDetails?.paymentId}
-                orderId={paymentDetails?.orderId}
+                leadId={leadId}
                 onBookingComplete={handleBookingComplete}
               />
             )}
@@ -188,22 +120,22 @@ export default function LandingPageContent() {
                   </svg>
                 </div>
                 <div className={styles.confBadge}>Kickoff Call Booked</div>
-                <h2 className={styles.confTitle}>Next Steps &amp; Launch Checklist</h2>
+                <h2 className={styles.confTitle}>You&apos;re All Set!</h2>
                 <p className={styles.confSubtitle}>
-                  Your build slot is locked. Here is a summary of your kickoff details and how to prepare:
+                  Your kickoff call is confirmed. A confirmation email has been sent to <strong>{savedFormData?.email}</strong>. Here&apos;s how to prepare:
                 </p>
                 <div className={styles.summaryList}>
                   <div className={styles.summaryItem}>
-                    <strong>Kickoff Receipt:</strong> $99.00 USD (Verified ✓)
+                    <strong>Scheduled:</strong> {bookingDetails?.formattedDateTime}
                   </div>
                   <div className={styles.summaryItem}>
-                    <strong>Scheduled Date:</strong> {bookingDetails?.formattedDateTime} (Google Calendar invite sent)
+                    <strong>Website Type:</strong> {savedFormData?.websiteType}
                   </div>
                 </div>
                 <div className={styles.prepPanel}>
                   <h3>Prepare for Kickoff:</h3>
                   <ul>
-                    <li>Brand identity (Logos, choice colors, font preferences).</li>
+                    <li>Brand identity (logos, colors, font preferences).</li>
                     <li>Existing site links or reference sites you love the design of.</li>
                     <li>Copy draft or bullet points about your services/products.</li>
                     <li>High-res images or portfolio assets you want embedded.</li>
@@ -233,7 +165,7 @@ export default function LandingPageContent() {
           <div className={styles.footerBrand}>
             <div className={styles.logo}><span>Go-Speed</span></div>
             <p className={styles.footerDesc}>
-              Premium, modern websites designed and developed in 48 hours for $99. Risk-free slot reservations.
+              Premium, modern websites designed and developed in 48 hours. Book a free kickoff call today.
             </p>
           </div>
           <div className={styles.footerLinks}>
@@ -244,7 +176,7 @@ export default function LandingPageContent() {
           </div>
           <div className={styles.footerGuarantee}>
             <strong>Risk-Free Pledge</strong>
-            <p>100% money-back guarantee. If you decide we aren&apos;t a fit during the kickoff call, receive an immediate refund.</p>
+            <p>100% satisfaction guarantee. If we aren&apos;t a fit during the kickoff call, we&apos;ll let you know upfront — no obligation.</p>
           </div>
         </ScrollReveal>
         <div className={styles.footerBottom}>

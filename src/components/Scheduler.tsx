@@ -6,8 +6,7 @@ import styles from "./Scheduler.module.css";
 
 interface SchedulerProps {
   formData: any;
-  paymentId: string;
-  orderId: string;
+  leadId: string;
   onBookingComplete: (bookingDetails: any) => void;
 }
 
@@ -25,14 +24,13 @@ declare global {
   }
 }
 
-export default function Scheduler({ formData, paymentId, orderId, onBookingComplete }: SchedulerProps) {
+export default function Scheduler({ formData, leadId, onBookingComplete }: SchedulerProps) {
   const [error, setError] = useState("");
   const [isConfirming, setIsConfirming] = useState(false);
   const hasBookedRef = useRef(false);
   const widgetContainerRef = useRef<HTMLDivElement>(null);
   const [scriptLoaded, setScriptLoaded] = useState(false);
 
-  // Handle Calendly script already being cached/loaded from a prior mount
   useEffect(() => {
     if (window.Calendly) setScriptLoaded(true);
   }, []);
@@ -77,8 +75,7 @@ export default function Scheduler({ formData, paymentId, orderId, onBookingCompl
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             type: "booking",
-            paymentId,
-            orderId,
+            leadId,
             formData,
             bookingDetails
           })
@@ -101,7 +98,7 @@ export default function Scheduler({ formData, paymentId, orderId, onBookingCompl
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formData, paymentId, orderId]);
+  }, [formData, leadId]);
 
   return (
     <div className={styles.container}>
@@ -111,16 +108,9 @@ export default function Scheduler({ formData, paymentId, orderId, onBookingCompl
         onLoad={() => setScriptLoaded(true)}
       />
 
-      <div className={styles.successBadge}>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="20 6 9 17 4 12"></polyline>
-        </svg>
-        Payment Received Successfully ($99)
-      </div>
-
-      <h2 className={styles.title}>Schedule Kickoff Call</h2>
+      <h2 className={styles.title}>Schedule Your Free Kickoff Call</h2>
       <p className={styles.subtitle}>
-        Payment verified. Pick a time for your 30-minute kickoff call. We'll confirm scope, structure, and design preferences, and you'll have your draft website within 48 hours of this call.
+        Pick a time for your free 30-minute kickoff call. We&apos;ll confirm scope, structure, and design preferences — your website will be ready within 48 hours of this call.
       </p>
 
       {error && <div className={styles.errorAlert}>{error}</div>}
@@ -129,7 +119,7 @@ export default function Scheduler({ formData, paymentId, orderId, onBookingCompl
       <div ref={widgetContainerRef} style={{ minWidth: "320px", height: "700px" }}></div>
 
       <p className={styles.timeZoneNote}>
-        * Slots display in your local timezone. A calendar invitation and email confirmation will be sent by Calendly upon scheduling.
+        * Slots display in your local timezone. A confirmation email will be sent upon scheduling.
       </p>
     </div>
   );

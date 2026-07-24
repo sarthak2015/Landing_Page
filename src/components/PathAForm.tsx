@@ -7,7 +7,6 @@ interface PathAFormProps {
   onSubmitSuccess: (formData: any) => Promise<void>;
   savedFormData: any;
   setSavedFormData: (data: any) => void;
-  isStripeLoading?: boolean;
 }
 
 interface PathAFormData {
@@ -68,7 +67,7 @@ const FEATURE_OPTIONS = [
   "Other"
 ];
 
-export default function PathAForm({ onSubmitSuccess, savedFormData, setSavedFormData, isStripeLoading = false }: PathAFormProps) {
+export default function PathAForm({ onSubmitSuccess, savedFormData, setSavedFormData }: PathAFormProps) {
   const [step, setStep] = useState(1);
   
   const [formData, setFormData] = useState<PathAFormData>({
@@ -345,7 +344,7 @@ export default function PathAForm({ onSubmitSuccess, savedFormData, setSavedForm
                 placeholder="john@example.com"
                 required
               />
-              <span className={styles.helperText}>Used for receipt + booking confirmation</span>
+              <span className={styles.helperText}>Used for booking confirmation email</span>
               {errors.email && <span className={styles.errorText}>{errors.email}</span>}
             </div>
 
@@ -620,13 +619,13 @@ export default function PathAForm({ onSubmitSuccess, savedFormData, setSavedForm
                 Back
               </button>
               
-              <button type="submit" className={styles.btnSubmit} disabled={isSubmitting || isStripeLoading}>
-                {isStripeLoading ? "Redirecting to checkout..." : isSubmitting ? "Preparing checkout..." : "Continue to payment — $99"}
+              <button type="submit" className={styles.btnSubmit} disabled={isSubmitting}>
+                {isSubmitting ? "Saving details..." : "Schedule My Kickoff Call →"}
               </button>
             </div>
 
             <p className={styles.microcopy}>
-              * You'll pay $99 now to lock your build slot. We'll book your 30-minute kickoff call right after, and your website will be ready within 48 hours of that call.
+              * Pick a time for your free 30-minute kickoff call. We'll confirm scope and design preferences, and your website will be ready within 48 hours of that call.
             </p>
           </div>
         )}
