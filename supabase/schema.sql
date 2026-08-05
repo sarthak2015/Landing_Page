@@ -7,7 +7,6 @@ create table if not exists leads (
   type text not null,
   status text not null default 'pending',
   form_data jsonb not null,
-  payment jsonb,
   booking jsonb,
   created_at timestamptz not null default now()
 );
