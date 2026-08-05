@@ -10,8 +10,8 @@ export default function TermsPage() {
     <LegalPage title="Terms of Service" updated="[DATE — fill in on publish]">
       <Section heading="1. Agreement to terms">
         <p>
-          By paying the $99 kickoff fee and using this website, you agree to these Terms of
-          Service. If you do not agree, please do not proceed with payment.
+          By booking a kickoff call and using this website, you agree to these Terms of
+          Service. If you do not agree, please do not proceed with booking.
         </p>
         <p>
           These services are provided by <Placeholder>[LEGAL BUSINESS NAME]</Placeholder>
@@ -21,28 +21,28 @@ export default function TermsPage() {
 
       <Section heading="2. The service">
         <p>
-          For a flat fee of $99, we lock a build slot and schedule a 30-minute kickoff call. After
+          We offer a 30-minute kickoff call to understand your goals, brand, and scope. After
           that call, we design and build a website matching the scope discussed, and deliver a
-          draft within 48 hours of the call. Any pages or features beyond what's included in the
-          base package may incur additional charges, which will always be agreed with you before
-          any extra work begins.
+          draft within 48 hours. Any pages or features beyond what's included in the base package
+          may incur additional charges, which will always be agreed with you before any extra work
+          begins. Domain registration and ongoing hosting costs, if applicable, are billed
+          separately by the relevant registrar/host, not by us.
         </p>
       </Section>
 
-      <Section heading="3. Payment">
+      <Section heading="3. Pricing &amp; billing">
         <p>
-          Payment is processed securely via Stripe at the time you submit the project
-          questionnaire. The $99 fee reserves your build slot and covers the kickoff call and
-          initial build. Domain registration and ongoing hosting costs, if applicable, are billed
-          separately by the relevant registrar/host, not by us.
+          Pricing is discussed and agreed during or after your kickoff call. Any fees are invoiced
+          separately and must be settled before the final website is handed over. We will always
+          be transparent about costs before any work begins.
         </p>
       </Section>
 
       <Section heading="4. Refund policy">
         <p>
-          We offer a 100% money-back guarantee: if, after the kickoff call, you decide we're not
-          the right fit, or you're not satisfied with the draft, contact us and we'll issue a full
-          refund of your $99 payment. To request a refund, email <Placeholder>[SUPPORT EMAIL]</Placeholder>.
+          We offer a 100% satisfaction guarantee: if, after the kickoff call, you decide we're not
+          the right fit, or you're not satisfied with the draft, contact us and we'll make it right.
+          To request a refund or discuss a concern, email <Placeholder>[SUPPORT EMAIL]</Placeholder>.
         </p>
       </Section>
 

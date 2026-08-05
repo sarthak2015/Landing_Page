@@ -36,7 +36,7 @@ export default function Hero({ onGetStarted }: HeroProps) {
             <span className={styles.trustDot}>•</span>
             <span>100% Money-Back Guarantee</span>
             <span className={styles.trustDot}>•</span>
-            <span>Secure Checkout</span>
+            <span>Book a Call Instantly</span>
           </div>
         </div>
       </div>

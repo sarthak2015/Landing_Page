@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
-import { createLead, findLeadByOrderId, listLeads, listNotifications, logNotification, updateLead } from "@/lib/leads";
+import { createLead, findLeadById, listLeads, listNotifications, logNotification, updateLead } from "@/lib/leads";
 import { verifySessionToken } from "@/lib/adminAuth";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { type } = body;
 
-    // --- CASE 1: Initial form submission (replaces Stripe payment step) ---
+    // --- CASE 1: Initial form submission ---
     if (type === "submit") {
       const { formData } = body;
 
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Missing bookingDetails" }, { status: 400 });
       }
 
-      const existingLead = leadId ? await findLeadByOrderId(leadId) : null;
+      const existingLead = leadId ? await findLeadById(leadId) : null;
 
       let lead;
       if (!existingLead) {

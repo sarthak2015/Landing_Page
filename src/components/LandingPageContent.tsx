@@ -91,7 +91,7 @@ export default function LandingPageContent() {
       <div ref={funnelRef} className={styles.funnelWorkspace} id="funnel-workspace">
         <ScrollReveal className={styles.workspaceContainer}>
           {submitError && (
-            <div className={styles.paymentErrorAlert}>
+            <div className={styles.submitErrorAlert}>
               <strong>Error:</strong> {submitError}
             </div>
           )}

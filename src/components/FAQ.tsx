@@ -34,12 +34,12 @@ export default function FAQ() {
       answer: "The 48-hour delivery clock starts immediately after our 30-minute kickoff call. This call is essential to review your goals, brand preferences, and structure. Getting this aligned beforehand is what allows us to design and code a flawless, tailored website in under 48 hours."
     },
     {
-      question: "What does the $99 fee cover?",
-      answer: "The $99 is a kickoff and build slot-locking fee. It guarantees a dedicated developer and designer for your project immediately following your kickoff call. There are no hidden platform markups; you'll only pay for your own domain and standard hosting platform fees."
+      question: "How much does it cost?",
+      answer: "Pricing is discussed transparently during or right after your kickoff call based on your exact scope. There are no hidden platform markups — you'll only pay for your own domain and standard hosting platform fees."
     },
     {
       question: "Is there really a 100% money-back guarantee?",
-      answer: "Yes, absolutely. If we hold our kickoff call and you feel we are not the right fit, or if you review the draft version and are not satisfied, just let us know. We will issue a full 100% refund of your $99 payment immediately. No pressure, no awkward questions."
+      answer: "Yes, absolutely. If we hold our kickoff call and you feel we are not the right fit, or if you review the draft and are not satisfied, just let us know. We will make it right or give you a full refund. No pressure, no awkward questions."
     },
     {
       question: "Can I connect my own domain and hosting?",
@@ -61,7 +61,7 @@ export default function FAQ() {
         <div className={styles.header}>
           <h2 className={styles.title}>Frequently Asked Questions</h2>
           <p className={styles.subtitle}>
-            Have questions about payments, timelines, or requirements? We've got answers.
+            Have questions about the process, timelines, or requirements? We've got answers.
           </p>
         </div>
 

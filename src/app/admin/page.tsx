@@ -107,8 +107,8 @@ export default function AdminDashboard() {
   };
 
   // Filter leads based on target columns
-  const paidCustomers = leads.filter(
-    (l) => l.type === "build_ready" && (l.status === "paid" || l.status === "scheduled")
+  const bookedClients = leads.filter(
+    (l) => l.type === "build_ready" && l.status === "scheduled"
   );
 
   const phoneInquiries = leads.filter(
@@ -166,7 +166,7 @@ export default function AdminDashboard() {
         <div className={styles.headerContainer}>
           <div>
             <h1 className={styles.title}>Admin Control Center</h1>
-            <p className={styles.subtitle}>Manage paid clients, inbound callback requests, and pre-fill shortcut checkouts.</p>
+            <p className={styles.subtitle}>Manage booked clients, inbound callback requests, and pre-fill shortcut links.</p>
           </div>
           <div className={styles.headerBtnGroup}>
             <button onClick={fetchData} className={styles.refreshBtn}>
@@ -189,13 +189,13 @@ export default function AdminDashboard() {
             {/* COLUMN 1: Paid Customers */}
             <div className={styles.column}>
               <h2 className={styles.columnHeader}>
-                Paid Customers ({paidCustomers.length})
+                Booked Clients ({bookedClients.length})
               </h2>
-              {paidCustomers.length === 0 ? (
-                <div className={styles.emptyState}>No paid transactions recorded.</div>
+              {bookedClients.length === 0 ? (
+                <div className={styles.emptyState}>No booked clients yet.</div>
               ) : (
                 <div className={styles.list}>
-                  {paidCustomers.map((lead) => (
+                  {bookedClients.map((lead) => (
                     <div key={lead.id} className={styles.leadCard}>
                       <div className={styles.cardHeaderRow}>
                         <span className={styles.statusBadgePaid}>
@@ -279,7 +279,7 @@ export default function AdminDashboard() {
                         {lead.formData.questions && <p className={styles.noteField}><strong>Questions:</strong> "{lead.formData.questions}"</p>}
                         
                         <div className={styles.actionRow}>
-                          <button onClick={() => generatePrefillLink(lead)} className={styles.paymentLinkBtn}>
+                          <button onClick={() => generatePrefillLink(lead)} className={styles.prefillLinkBtn}>
                             {copiedLinkMap[lead.id] ? "Copied Link" : "Copy Form Prefill Link"}
                           </button>
                         </div>

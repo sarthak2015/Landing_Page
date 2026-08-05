@@ -29,17 +29,15 @@ export default function PrivacyPolicyPage() {
         <ul>
           <li>Name, business name, email address, and phone number</li>
           <li>Project details you provide (website type, pages, features, domain/logo status, notes)</li>
-          <li>Payment confirmation details from Stripe (we never see or store your full card number)</li>
           <li>Scheduling details when you book a kickoff call via Calendly</li>
         </ul>
       </Section>
 
       <Section heading="3. How we use your information">
         <ul>
-          <li>To process your $99 payment and confirm your build slot</li>
-          <li>To schedule and prepare for your kickoff call</li>
+          <li>To confirm your build slot and schedule your kickoff call</li>
           <li>To design and build the website you requested</li>
-          <li>To send receipts, confirmations, and project-related communication</li>
+          <li>To send confirmations and project-related communication</li>
         </ul>
         <p>We do not sell your personal information to third parties.</p>
       </Section>
@@ -47,18 +45,18 @@ export default function PrivacyPolicyPage() {
       <Section heading="4. Third-party services we use">
         <p>To operate this site, we share limited data with:</p>
         <ul>
-          <li><strong>Stripe</strong> — payment processing. Card details go directly to Stripe; we never store them.</li>
           <li><strong>Supabase</strong> — secure database storage for your submitted project details.</li>
           <li><strong>Calendly</strong> — scheduling your kickoff call (name and email are shared to book the slot).</li>
+          <li><strong>Resend</strong> — transactional email delivery for booking confirmations.</li>
         </ul>
         <p>Each of these providers has its own privacy policy governing how they handle data.</p>
       </Section>
 
       <Section heading="5. Data retention">
         <p>
-          We retain your project and payment records for as long as needed to deliver your
-          website and to comply with applicable tax, accounting, and legal obligations. You can
-          request deletion of your data at any time by contacting <Placeholder>[SUPPORT EMAIL]</Placeholder>.
+          We retain your project records for as long as needed to deliver your website and to
+          comply with applicable accounting and legal obligations. You can request deletion of
+          your data at any time by contacting <Placeholder>[SUPPORT EMAIL]</Placeholder>.
         </p>
       </Section>
 

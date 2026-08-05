@@ -5,7 +5,6 @@ export interface Lead {
   type: string;
   status: string;
   formData: any;
-  payment: any;
   booking: any;
   createdAt: string;
 }
@@ -15,7 +14,6 @@ interface LeadRow {
   type: string;
   status: string;
   form_data: any;
-  payment: any;
   booking: any;
   created_at: string;
 }
@@ -26,7 +24,6 @@ function rowToLead(row: LeadRow): Lead {
     type: row.type,
     status: row.status,
     formData: row.form_data,
-    payment: row.payment,
     booking: row.booking,
     createdAt: row.created_at
   };
@@ -58,7 +55,6 @@ export async function createLead(lead: {
   type: string;
   status: string;
   formData: any;
-  payment?: any;
   booking?: any;
 }): Promise<Lead> {
   const { data, error } = await supabaseAdmin
@@ -68,7 +64,6 @@ export async function createLead(lead: {
       type: lead.type,
       status: lead.status,
       form_data: lead.formData,
-      payment: lead.payment ?? null,
       booking: lead.booking ?? null
     })
     .select()
@@ -80,11 +75,10 @@ export async function createLead(lead: {
 
 export async function updateLead(
   id: string,
-  updates: { status?: string; payment?: any; booking?: any }
+  updates: { status?: string; booking?: any }
 ): Promise<Lead | null> {
   const patch: Record<string, any> = {};
   if (updates.status !== undefined) patch.status = updates.status;
-  if (updates.payment !== undefined) patch.payment = updates.payment;
   if (updates.booking !== undefined) patch.booking = updates.booking;
 
   const { data, error } = await supabaseAdmin
@@ -98,11 +92,11 @@ export async function updateLead(
   return data ? rowToLead(data as LeadRow) : null;
 }
 
-export async function findLeadByOrderId(orderId: string): Promise<Lead | null> {
+export async function findLeadById(leadId: string): Promise<Lead | null> {
   const { data, error } = await supabaseAdmin
     .from("leads")
     .select("*")
-    .or(`id.eq.${orderId},payment->>orderId.eq.${orderId}`)
+    .eq("id", leadId)
     .maybeSingle();
 
   if (error) throw new Error(error.message);
