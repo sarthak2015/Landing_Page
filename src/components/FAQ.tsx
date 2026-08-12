@@ -5,22 +5,22 @@ import ScrollReveal from "./ScrollReveal";
 interface FAQItemProps {
   question: string;
   answer: string;
+  isOpen: boolean;
+  onToggle: () => void;
 }
 
-function FAQItem({ question, answer }: FAQItemProps) {
-  const [isOpen, setIsOpen] = useState(false);
-
+function FAQItem({ question, answer, isOpen, onToggle }: FAQItemProps) {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      setIsOpen(!isOpen);
+      onToggle();
     }
   };
 
   return (
     <div
       className={`${styles.item} ${isOpen ? styles.open : ""}`}
-      onClick={() => setIsOpen(!isOpen)}
+      onClick={onToggle}
       onKeyDown={handleKeyDown}
       role="button"
       tabIndex={0}
@@ -42,6 +42,8 @@ function FAQItem({ question, answer }: FAQItemProps) {
 }
 
 export default function FAQ() {
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
+
   const faqs = [
     {
       question: "How does the 48-hour delivery timeline work?",
@@ -69,6 +71,10 @@ export default function FAQ() {
     }
   ];
 
+  const handleToggle = (index: number) => {
+    setOpenIndex((prev) => (prev === index ? null : index));
+  };
+
   return (
     <section className={styles.faqSection} id="faq-section">
       <ScrollReveal className={styles.container}>
@@ -81,7 +87,13 @@ export default function FAQ() {
 
         <div className={styles.list}>
           {faqs.map((faq, index) => (
-            <FAQItem key={index} question={faq.question} answer={faq.answer} />
+            <FAQItem
+              key={index}
+              question={faq.question}
+              answer={faq.answer}
+              isOpen={openIndex === index}
+              onToggle={() => handleToggle(index)}
+            />
           ))}
         </div>
       </ScrollReveal>

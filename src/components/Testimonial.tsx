@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./Testimonial.module.css";
 import ScrollReveal from "./ScrollReveal";
 
@@ -28,6 +28,15 @@ const REVIEWS = [
 
 export default function Testimonial() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  useEffect(() => {
+    if (isPaused) return;
+    const timer = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % REVIEWS.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [isPaused]);
 
   return (
     <section className={styles.section} id="testimonials-section">
@@ -37,7 +46,11 @@ export default function Testimonial() {
           <h2 className={styles.title}>Real Results, Real Fast</h2>
         </div>
 
-        <div className={styles.cardContainer}>
+        <div
+          className={styles.cardContainer}
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+        >
           <div key={activeIndex} className={styles.testimonialCard}>
             <div className={styles.stars}>
               {[...Array(5)].map((_, i) => (
