@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import { supabaseAdmin } from "./supabase";
 
 export interface Lead {
@@ -29,40 +31,73 @@ function rowToLead(row: LeadRow): Lead {
   };
 }
 
-// In-memory fallback storage when Supabase network is unreachable or offline
-const fallbackLeadsMap = new Map<string, Lead>();
+// Disk file fallback helper
+const getFilePath = () => {
+  const tmpDir = process.env.TMPDIR || process.env.TMP || "/tmp";
+  return path.join(tmpDir, "go_speed_leads.json");
+};
+
+// Memory cache for runtime persistence across API invocations
+const memoryLeadsMap = new Map<string, Lead>();
+
+function readLocalLeads(): Lead[] {
+  try {
+    const filePath = getFilePath();
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, "utf-8");
+      const parsed: Lead[] = JSON.parse(content);
+      parsed.forEach((l) => memoryLeadsMap.set(l.id, l));
+    }
+  } catch (e) {
+    console.warn("Error reading local leads file:", e);
+  }
+  return Array.from(memoryLeadsMap.values());
+}
+
+function writeLocalLeads(leads: Lead[]) {
+  try {
+    leads.forEach((l) => memoryLeadsMap.set(l.id, l));
+    const filePath = getFilePath();
+    fs.writeFileSync(filePath, JSON.stringify(Array.from(memoryLeadsMap.values()), null, 2), "utf-8");
+  } catch (e) {
+    console.warn("Error writing local leads file:", e);
+  }
+}
 
 export async function listLeads(): Promise<Lead[]> {
+  const localLeads = readLocalLeads();
+
   try {
     const { data, error } = await supabaseAdmin
       .from("leads")
       .select("*")
       .order("created_at", { ascending: false });
 
-    if (error) {
-      console.warn("Supabase query warning (using fallback store):", error.message);
-      return Array.from(fallbackLeadsMap.values()).sort(
+    if (!error && data) {
+      const remoteLeads = (data as LeadRow[]).map(rowToLead);
+      const map = new Map<string, Lead>();
+      remoteLeads.forEach((l) => map.set(l.id, l));
+      localLeads.forEach((l) => map.set(l.id, l));
+      const combined = Array.from(map.values()).sort(
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
+      writeLocalLeads(combined);
+      return combined;
     }
-
-    const remoteLeads = (data as LeadRow[]).map(rowToLead);
-    
-    // Merge remote leads with fallback leads to ensure no submissions are missed
-    remoteLeads.forEach((l) => fallbackLeadsMap.set(l.id, l));
-
-    return Array.from(fallbackLeadsMap.values()).sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
   } catch (err: any) {
-    console.warn("Supabase fetch failed (returning local memory leads):", err?.message || err);
-    return Array.from(fallbackLeadsMap.values()).sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
+    console.warn("Supabase listLeads error (using local disk/memory fallback):", err?.message || err);
   }
+
+  return localLeads.sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
 }
 
 export async function getLead(id: string): Promise<Lead | null> {
+  const localLeads = readLocalLeads();
+  const foundLocal = localLeads.find((l) => l.id === id);
+  if (foundLocal) return foundLocal;
+
   try {
     const { data, error } = await supabaseAdmin
       .from("leads")
@@ -74,7 +109,7 @@ export async function getLead(id: string): Promise<Lead | null> {
   } catch (err) {
     console.warn("getLead Supabase fetch error:", err);
   }
-  return fallbackLeadsMap.get(id) || null;
+  return null;
 }
 
 export async function createLead(lead: {
@@ -93,8 +128,10 @@ export async function createLead(lead: {
     createdAt: new Date().toISOString()
   };
 
-  // Always store in memory fallback first
-  fallbackLeadsMap.set(newLead.id, newLead);
+  // Always store locally first so it is never lost
+  const localLeads = readLocalLeads();
+  const updatedList = [newLead, ...localLeads.filter((l) => l.id !== newLead.id)];
+  writeLocalLeads(updatedList);
 
   try {
     const { data, error } = await supabaseAdmin
@@ -111,13 +148,11 @@ export async function createLead(lead: {
 
     if (!error && data) {
       const created = rowToLead(data as LeadRow);
-      fallbackLeadsMap.set(created.id, created);
+      memoryLeadsMap.set(created.id, created);
       return created;
-    } else if (error) {
-      console.warn("createLead Supabase error (saved to fallback store):", error.message);
     }
   } catch (err: any) {
-    console.warn("createLead fetch failed (saved to local fallback store):", err?.message || err);
+    console.warn("createLead Supabase error (saved locally):", err?.message || err);
   }
 
   return newLead;
@@ -127,14 +162,15 @@ export async function updateLead(
   id: string,
   updates: { status?: string; booking?: any }
 ): Promise<Lead | null> {
-  let existing = fallbackLeadsMap.get(id);
+  const localLeads = readLocalLeads();
+  let existing = localLeads.find((l) => l.id === id);
   if (existing) {
     existing = {
       ...existing,
       status: updates.status !== undefined ? updates.status : existing.status,
       booking: updates.booking !== undefined ? updates.booking : existing.booking
     };
-    fallbackLeadsMap.set(id, existing);
+    writeLocalLeads([existing, ...localLeads.filter((l) => l.id !== id)]);
   }
 
   try {
@@ -151,7 +187,7 @@ export async function updateLead(
 
     if (!error && data) {
       const updated = rowToLead(data as LeadRow);
-      fallbackLeadsMap.set(updated.id, updated);
+      memoryLeadsMap.set(updated.id, updated);
       return updated;
     }
   } catch (err) {

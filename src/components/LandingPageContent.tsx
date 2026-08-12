@@ -55,19 +55,20 @@ export default function LandingPageContent() {
     if (formData?.email) params.set("email", formData.email);
     const calendlyUrl = params.toString() ? `${CALENDLY_BASE_URL}?${params.toString()}` : CALENDLY_BASE_URL;
 
-    try {
-      const response = await fetch("/api/leads", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "submit", formData })
-      });
+    const response = await fetch("/api/leads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "submit", formData })
+    });
 
-      const data = await response.json();
-      if (response.ok && data?.lead?.id) {
-        setLeadId(data.lead.id);
-      }
-    } catch (err) {
-      console.error("Failed to save lead in background:", err);
+    const data = await response.json();
+
+    if (!response.ok || data.error) {
+      throw new Error(data.error || "Failed to save your requirements. Please try again.");
+    }
+
+    if (data?.lead?.id) {
+      setLeadId(data.lead.id);
     }
 
     // Update state to scheduler view and perform direct browser redirect to Calendly
