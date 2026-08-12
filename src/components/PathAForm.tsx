@@ -227,14 +227,17 @@ export default function PathAForm({ onSubmitSuccess, savedFormData, setSavedForm
   const validateStep2 = () => {
     const newErrors: Record<string, string> = {};
     
+    // Ensure default websiteType if user didn't explicitly pick one
     if (!formData.websiteType) {
-      newErrors.websiteType = "Please select a website type";
+      setFormData((prev) => ({ ...prev, websiteType: "Business Website" }));
     }
+    // Ensure default pages if user didn't select any
     if (formData.selectedPages.length === 0) {
-      newErrors.selectedPages = "Please select at least one page";
+      setFormData((prev) => ({ ...prev, selectedPages: ["Home", "About Us", "Services", "Contact Us"] }));
     }
+    // Ensure default features if user didn't select any
     if (formData.selectedFeatures.length === 0) {
-      newErrors.selectedFeatures = "Please select at least one feature";
+      setFormData((prev) => ({ ...prev, selectedFeatures: ["Contact Form", "WhatsApp Chat Button", "Google Maps"] }));
     }
     if (formData.hasDomain === "Yes" && !formData.domainName.trim()) {
       newErrors.domainName = "Please enter your domain name";

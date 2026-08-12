@@ -36,26 +36,35 @@ export default function LandingPageContent() {
     setTimeout(() => funnelRef.current?.scrollIntoView({ behavior: "smooth" }), 150);
   };
 
-  // Form submitted → save lead → show Calendly
+  // Form submitted → save lead → redirect to Calendly
   const handleFormSubmit = async (formData: any) => {
     setSavedFormData(formData);
     setSubmitError("");
 
-    const response = await fetch("/api/leads", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type: "submit", formData })
-    });
+    const CALENDLY_BASE_URL = "https://calendly.com/dhruv-go-techsolution/30min";
+    const params = new URLSearchParams();
+    if (formData?.name) params.set("name", formData.name);
+    if (formData?.email) params.set("email", formData.email);
+    const calendlyUrl = params.toString() ? `${CALENDLY_BASE_URL}?${params.toString()}` : CALENDLY_BASE_URL;
 
-    const data = await response.json();
+    try {
+      const response = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "submit", formData })
+      });
 
-    if (!response.ok || data.error) {
-      throw new Error(data.error || "Failed to save your details. Please try again.");
+      const data = await response.json();
+      if (response.ok && data?.lead?.id) {
+        setLeadId(data.lead.id);
+      }
+    } catch (err) {
+      console.error("Failed to save lead in background:", err);
     }
 
-    setLeadId(data.lead.id);
+    // Update state to scheduler view and perform direct browser redirect to Calendly
     setPathAStep("scheduler");
-    setTimeout(() => funnelRef.current?.scrollIntoView({ behavior: "smooth" }), 150);
+    window.location.href = calendlyUrl;
   };
 
   // Calendly booking complete → confirmed state
