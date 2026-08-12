@@ -71,9 +71,9 @@ export default function LandingPageContent() {
       setLeadId(data.lead.id);
     }
 
-    // Update state to scheduler view and perform direct browser redirect to Calendly
+    // Update state to scheduler view and smooth scroll to inline Calendly widget
     setPathAStep("scheduler");
-    window.location.href = calendlyUrl;
+    setTimeout(() => funnelRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
   };
 
   // Calendly booking complete → confirmed state

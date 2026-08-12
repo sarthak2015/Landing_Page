@@ -27,75 +27,26 @@ declare global {
 export default function Scheduler({ formData, leadId, onBookingComplete }: SchedulerProps) {
   const [error, setError] = useState("");
   const [isConfirming, setIsConfirming] = useState(false);
-  const [widgetLoaded, setWidgetLoaded] = useState(false);
   const hasBookedRef = useRef(false);
-  const widgetContainerRef = useRef<HTMLDivElement>(null);
 
-  // Construct prefilled direct URL
-  const directCalendlyUrl = React.useMemo(() => {
-    const params = new URLSearchParams();
-    if (formData?.name) params.set("name", formData.name);
-    if (formData?.email) params.set("email", formData.email);
-    const queryString = params.toString();
-    return queryString ? `${CALENDLY_URL}?${queryString}` : CALENDLY_URL;
-  }, [formData?.name, formData?.email]);
+  // Construct prefilled Calendly inline iframe URL
+  const iframeUrl = React.useMemo(() => {
+    const params = new URLSearchParams({
+      embed_type: "Inline"
+    });
 
-  useEffect(() => {
-    let isMounted = true;
-
-    const initWidget = () => {
-      if (!widgetContainerRef.current || !window.Calendly) return;
-      
-      // Clear container before initializing to prevent duplicate embeds
-      widgetContainerRef.current.innerHTML = "";
-      
-      try {
-        window.Calendly.initInlineWidget({
-          url: directCalendlyUrl,
-          parentElement: widgetContainerRef.current,
-          prefill: {
-            name: formData?.name || "",
-            email: formData?.email || ""
-          }
-        });
-        if (isMounted) setWidgetLoaded(true);
-      } catch (err) {
-        console.error("Calendly widget initialization failed:", err);
-      }
-    };
-
-    if (window.Calendly) {
-      initWidget();
-    } else {
-      let script = document.querySelector('script[src="https://assets.calendly.com/assets/external/widget.js"]') as HTMLScriptElement;
-      
-      if (!script) {
-        script = document.createElement("script");
-        script.src = "https://assets.calendly.com/assets/external/widget.js";
-        script.async = true;
-        document.head.appendChild(script);
-      }
-
-      const handleScriptLoad = () => {
-        if (isMounted) initWidget();
-      };
-
-      script.addEventListener("load", handleScriptLoad);
-
-      // Fallback check in case load event already fired
-      const timer = setTimeout(() => {
-        if (window.Calendly && isMounted) {
-          initWidget();
-        }
-      }, 800);
-
-      return () => {
-        isMounted = false;
-        script.removeEventListener("load", handleScriptLoad);
-        clearTimeout(timer);
-      };
+    if (typeof window !== "undefined") {
+      params.set("embed_domain", window.location.hostname);
     }
-  }, [directCalendlyUrl, formData?.name, formData?.email]);
+    if (formData?.name) {
+      params.set("name", formData.name);
+    }
+    if (formData?.email) {
+      params.set("email", formData.email);
+    }
+
+    return `${CALENDLY_URL}?${params.toString()}`;
+  }, [formData?.name, formData?.email]);
 
   useEffect(() => {
     const handleMessage = async (e: MessageEvent) => {
@@ -150,24 +101,6 @@ export default function Scheduler({ formData, leadId, onBookingComplete }: Sched
 
   return (
     <div className={styles.container}>
-      <Script
-        src="https://assets.calendly.com/assets/external/widget.js"
-        strategy="lazyOnload"
-        onLoad={() => {
-          if (window.Calendly && widgetContainerRef.current && !widgetLoaded) {
-            window.Calendly.initInlineWidget({
-              url: directCalendlyUrl,
-              parentElement: widgetContainerRef.current,
-              prefill: {
-                name: formData?.name || "",
-                email: formData?.email || ""
-              }
-            });
-            setWidgetLoaded(true);
-          }
-        }}
-      />
-
       <h2 className={styles.title}>Schedule Your Free Kickoff Call</h2>
       <p className={styles.subtitle}>
         Pick a time for your free 30-minute kickoff call. We&apos;ll confirm scope, structure, and design preferences — your website will be ready within 48 hours of this call.
@@ -176,21 +109,16 @@ export default function Scheduler({ formData, leadId, onBookingComplete }: Sched
       {error && <div className={styles.errorAlert}>{error}</div>}
       {isConfirming && <div className={styles.errorAlert}>Confirming your booking...</div>}
 
-      <div className={styles.directLinkBox}>
-        <span className={styles.directLinkText}>
-          Having trouble viewing the calendar widget below?
-        </span>
-        <a
-          href={directCalendlyUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={styles.directBtn}
-        >
-          Open Calendly in New Tab →
-        </a>
+      <div style={{ width: "100%", minHeight: "700px", borderRadius: "12px", overflow: "hidden" }}>
+        <iframe
+          src={iframeUrl}
+          width="100%"
+          height="700"
+          frameBorder="0"
+          title="Schedule Your Kickoff Call"
+          style={{ border: "none", width: "100%", height: "700px", minWidth: "320px" }}
+        ></iframe>
       </div>
-
-      <div ref={widgetContainerRef} style={{ minWidth: "320px", height: "700px" }}></div>
 
       <p className={styles.timeZoneNote}>
         * Slots display in your local timezone. A confirmation email will be sent upon scheduling.
