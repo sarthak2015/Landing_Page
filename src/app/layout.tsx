@@ -17,6 +17,8 @@ export const metadata: Metadata = {
   description: "Get a high-performance, conversion-optimized Next.js website delivered within 48 hours of our kickoff call for just $99.",
 };
 
+import MetaPixel from "@/components/MetaPixel";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -27,7 +29,10 @@ export default function RootLayout({
       <head>
         <link rel="stylesheet" href="https://assets.calendly.com/assets/external/widget.css" />
       </head>
-      <body suppressHydrationWarning>{children}</body>
+      <body suppressHydrationWarning>
+        <MetaPixel />
+        {children}
+      </body>
     </html>
   );
 }

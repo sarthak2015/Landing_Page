@@ -12,6 +12,7 @@ import FAQ from "./FAQ";
 import PathAForm from "./PathAForm";
 import Scheduler from "./Scheduler";
 import ScrollReveal from "./ScrollReveal";
+import { trackEvent } from "@/lib/metaPixel";
 
 
 export default function LandingPageContent() {
@@ -40,6 +41,13 @@ export default function LandingPageContent() {
   const handleFormSubmit = async (formData: any) => {
     setSavedFormData(formData);
     setSubmitError("");
+
+    // Trigger Meta Pixel "Lead" conversion event
+    trackEvent("Lead", {
+      content_name: formData?.websiteType || "Website Kickoff",
+      value: 99.00,
+      currency: "USD"
+    });
 
     const CALENDLY_BASE_URL = "https://calendly.com/dhruv-go-techsolution/30min";
     const params = new URLSearchParams();
