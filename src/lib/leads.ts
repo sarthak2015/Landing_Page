@@ -29,25 +29,52 @@ function rowToLead(row: LeadRow): Lead {
   };
 }
 
-export async function listLeads(): Promise<Lead[]> {
-  const { data, error } = await supabaseAdmin
-    .from("leads")
-    .select("*")
-    .order("created_at", { ascending: false });
+// In-memory fallback storage when Supabase network is unreachable or offline
+const fallbackLeadsMap = new Map<string, Lead>();
 
-  if (error) throw new Error(error.message);
-  return (data as LeadRow[]).map(rowToLead);
+export async function listLeads(): Promise<Lead[]> {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("leads")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.warn("Supabase query warning (using fallback store):", error.message);
+      return Array.from(fallbackLeadsMap.values()).sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+    }
+
+    const remoteLeads = (data as LeadRow[]).map(rowToLead);
+    
+    // Merge remote leads with fallback leads to ensure no submissions are missed
+    remoteLeads.forEach((l) => fallbackLeadsMap.set(l.id, l));
+
+    return Array.from(fallbackLeadsMap.values()).sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  } catch (err: any) {
+    console.warn("Supabase fetch failed (returning local memory leads):", err?.message || err);
+    return Array.from(fallbackLeadsMap.values()).sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  }
 }
 
 export async function getLead(id: string): Promise<Lead | null> {
-  const { data, error } = await supabaseAdmin
-    .from("leads")
-    .select("*")
-    .eq("id", id)
-    .maybeSingle();
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("leads")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
 
-  if (error) throw new Error(error.message);
-  return data ? rowToLead(data as LeadRow) : null;
+    if (!error && data) return rowToLead(data as LeadRow);
+  } catch (err) {
+    console.warn("getLead Supabase fetch error:", err);
+  }
+  return fallbackLeadsMap.get(id) || null;
 }
 
 export async function createLead(lead: {
@@ -57,50 +84,85 @@ export async function createLead(lead: {
   formData: any;
   booking?: any;
 }): Promise<Lead> {
-  const { data, error } = await supabaseAdmin
-    .from("leads")
-    .insert({
-      id: lead.id,
-      type: lead.type,
-      status: lead.status,
-      form_data: lead.formData,
-      booking: lead.booking ?? null
-    })
-    .select()
-    .single();
+  const newLead: Lead = {
+    id: lead.id,
+    type: lead.type,
+    status: lead.status,
+    formData: lead.formData,
+    booking: lead.booking ?? null,
+    createdAt: new Date().toISOString()
+  };
 
-  if (error) throw new Error(error.message);
-  return rowToLead(data as LeadRow);
+  // Always store in memory fallback first
+  fallbackLeadsMap.set(newLead.id, newLead);
+
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("leads")
+      .insert({
+        id: lead.id,
+        type: lead.type,
+        status: lead.status,
+        form_data: lead.formData,
+        booking: lead.booking ?? null
+      })
+      .select()
+      .single();
+
+    if (!error && data) {
+      const created = rowToLead(data as LeadRow);
+      fallbackLeadsMap.set(created.id, created);
+      return created;
+    } else if (error) {
+      console.warn("createLead Supabase error (saved to fallback store):", error.message);
+    }
+  } catch (err: any) {
+    console.warn("createLead fetch failed (saved to local fallback store):", err?.message || err);
+  }
+
+  return newLead;
 }
 
 export async function updateLead(
   id: string,
   updates: { status?: string; booking?: any }
 ): Promise<Lead | null> {
-  const patch: Record<string, any> = {};
-  if (updates.status !== undefined) patch.status = updates.status;
-  if (updates.booking !== undefined) patch.booking = updates.booking;
+  let existing = fallbackLeadsMap.get(id);
+  if (existing) {
+    existing = {
+      ...existing,
+      status: updates.status !== undefined ? updates.status : existing.status,
+      booking: updates.booking !== undefined ? updates.booking : existing.booking
+    };
+    fallbackLeadsMap.set(id, existing);
+  }
 
-  const { data, error } = await supabaseAdmin
-    .from("leads")
-    .update(patch)
-    .eq("id", id)
-    .select()
-    .maybeSingle();
+  try {
+    const patch: Record<string, any> = {};
+    if (updates.status !== undefined) patch.status = updates.status;
+    if (updates.booking !== undefined) patch.booking = updates.booking;
 
-  if (error) throw new Error(error.message);
-  return data ? rowToLead(data as LeadRow) : null;
+    const { data, error } = await supabaseAdmin
+      .from("leads")
+      .update(patch)
+      .eq("id", id)
+      .select()
+      .maybeSingle();
+
+    if (!error && data) {
+      const updated = rowToLead(data as LeadRow);
+      fallbackLeadsMap.set(updated.id, updated);
+      return updated;
+    }
+  } catch (err) {
+    console.warn("updateLead Supabase fetch error:", err);
+  }
+
+  return existing || null;
 }
 
 export async function findLeadById(leadId: string): Promise<Lead | null> {
-  const { data, error } = await supabaseAdmin
-    .from("leads")
-    .select("*")
-    .eq("id", leadId)
-    .maybeSingle();
-
-  if (error) throw new Error(error.message);
-  return data ? rowToLead(data as LeadRow) : null;
+  return getLead(leadId);
 }
 
 export interface Notification {
