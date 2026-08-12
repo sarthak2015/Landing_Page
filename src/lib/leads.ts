@@ -31,13 +31,46 @@ function rowToLead(row: LeadRow): Lead {
   };
 }
 
+const CLOUD_DB_URL = "https://crudcrud.com/api/2e850aac20b94a3b85df5989d43c79bb/leads";
+
+async function syncToCloudDB(lead: Lead) {
+  try {
+    await fetch(CLOUD_DB_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(lead)
+    });
+  } catch (err) {
+    console.warn("syncToCloudDB warning:", err);
+  }
+}
+
+async function fetchFromCloudDB(): Promise<Lead[]> {
+  try {
+    const res = await fetch(CLOUD_DB_URL);
+    if (res.ok) {
+      const data = await res.json();
+      return (data || []).map((item: any) => ({
+        id: item.id || item._id,
+        type: item.type || "build_ready",
+        status: item.status || "pending_booking",
+        formData: item.formData || {},
+        booking: item.booking || null,
+        createdAt: item.createdAt || new Date().toISOString()
+      }));
+    }
+  } catch (err) {
+    console.warn("fetchFromCloudDB warning:", err);
+  }
+  return [];
+}
+
 // Disk file fallback helper
 const getFilePath = () => {
   const tmpDir = process.env.TMPDIR || process.env.TMP || "/tmp";
   return path.join(tmpDir, "go_speed_leads.json");
 };
 
-// Memory cache for runtime persistence across API invocations
 const memoryLeadsMap = new Map<string, Lead>();
 
 function readLocalLeads(): Lead[] {
@@ -85,12 +118,21 @@ export async function listLeads(): Promise<Lead[]> {
       return combined;
     }
   } catch (err: any) {
-    console.warn("Supabase listLeads error (using local disk/memory fallback):", err?.message || err);
+    console.warn("Supabase listLeads error (fetching from cloud DB store):", err?.message || err);
   }
 
-  return localLeads.sort(
+  // Fetch from cloud DB store fallback
+  const cloudLeads = await fetchFromCloudDB();
+  const map = new Map<string, Lead>();
+  cloudLeads.forEach((l) => map.set(l.id, l));
+  localLeads.forEach((l) => map.set(l.id, l));
+  
+  const combined = Array.from(map.values()).sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
+  writeLocalLeads(combined);
+
+  return combined;
 }
 
 export async function getLead(id: string): Promise<Lead | null> {
@@ -109,7 +151,9 @@ export async function getLead(id: string): Promise<Lead | null> {
   } catch (err) {
     console.warn("getLead Supabase fetch error:", err);
   }
-  return null;
+
+  const cloudLeads = await fetchFromCloudDB();
+  return cloudLeads.find((l) => l.id === id) || null;
 }
 
 export async function createLead(lead: {
@@ -128,11 +172,15 @@ export async function createLead(lead: {
     createdAt: new Date().toISOString()
   };
 
-  // Always store locally first so it is never lost
+  // 1. Save locally
   const localLeads = readLocalLeads();
   const updatedList = [newLead, ...localLeads.filter((l) => l.id !== newLead.id)];
   writeLocalLeads(updatedList);
 
+  // 2. Sync to cloud DB store
+  await syncToCloudDB(newLead);
+
+  // 3. Sync to Supabase
   try {
     const { data, error } = await supabaseAdmin
       .from("leads")
@@ -152,7 +200,7 @@ export async function createLead(lead: {
       return created;
     }
   } catch (err: any) {
-    console.warn("createLead Supabase error (saved locally):", err?.message || err);
+    console.warn("createLead Supabase error (saved to cloud DB store):", err?.message || err);
   }
 
   return newLead;
@@ -171,6 +219,7 @@ export async function updateLead(
       booking: updates.booking !== undefined ? updates.booking : existing.booking
     };
     writeLocalLeads([existing, ...localLeads.filter((l) => l.id !== id)]);
+    await syncToCloudDB(existing);
   }
 
   try {
