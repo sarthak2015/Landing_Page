@@ -7,20 +7,20 @@ export const metadata: Metadata = {
 
 export default function PrivacyPolicyPage() {
   return (
-    <LegalPage title="Privacy Policy" updated="[DATE — fill in on publish]">
+    <LegalPage title="Privacy Policy" updated="August 12, 2026">
       <Section heading="1. Who we are">
         <p>
-          Go-Speed ("we", "us", "our") operates the website at{" "}
+          Go Tech Solution ("we", "us", "our") operates the website at{" "}
           <strong>speed.go-techsolution.com</strong>. This policy explains what
           information we collect from visitors and customers, why we collect it, and how it's
           used and protected.
         </p>
         <p>
-          Legal business name: <Placeholder>[LEGAL BUSINESS NAME]</Placeholder>
+          Legal business name: <strong>Go Tech Solution</strong>
           <br />
-          Business address: <Placeholder>[BUSINESS ADDRESS]</Placeholder>
+          Business address: <strong>Ahmedabad, Gujarat, India</strong>
           <br />
-          Contact email: <Placeholder>[SUPPORT EMAIL]</Placeholder>
+          Contact &amp; Support email: <a href="mailto:Dhruv@go-techsolution.com">Dhruv@go-techsolution.com</a>
         </p>
       </Section>
 
@@ -56,7 +56,7 @@ export default function PrivacyPolicyPage() {
         <p>
           We retain your project records for as long as needed to deliver your website and to
           comply with applicable accounting and legal obligations. You can request deletion of
-          your data at any time by contacting <Placeholder>[SUPPORT EMAIL]</Placeholder>.
+          your data at any time by contacting <a href="mailto:Dhruv@go-techsolution.com">Dhruv@go-techsolution.com</a>.
         </p>
       </Section>
 
@@ -64,7 +64,7 @@ export default function PrivacyPolicyPage() {
         <p>
           Depending on where you live, you may have the right to access, correct, or delete the
           personal information we hold about you, or to object to certain uses of it. To exercise
-          these rights, contact us at <Placeholder>[SUPPORT EMAIL]</Placeholder>.
+          these rights, contact us at <a href="mailto:Dhruv@go-techsolution.com">Dhruv@go-techsolution.com</a>.
         </p>
       </Section>
 
@@ -77,7 +77,7 @@ export default function PrivacyPolicyPage() {
 
       <Section heading="8. Contact us">
         <p>
-          Questions about this policy or your data? Email us at <Placeholder>[SUPPORT EMAIL]</Placeholder>.
+          Questions about this policy or your data? Email us at <a href="mailto:Dhruv@go-techsolution.com">Dhruv@go-techsolution.com</a>.
         </p>
       </Section>
     </LegalPage>

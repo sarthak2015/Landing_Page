@@ -7,15 +7,15 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <LegalPage title="Terms of Service" updated="[DATE — fill in on publish]">
+    <LegalPage title="Terms of Service" updated="August 12, 2026">
       <Section heading="1. Agreement to terms">
         <p>
           By booking a kickoff call and using this website, you agree to these Terms of
           Service. If you do not agree, please do not proceed with booking.
         </p>
         <p>
-          These services are provided by <Placeholder>[LEGAL BUSINESS NAME]</Placeholder>
-          {" "}("we", "us", "our"), located at <Placeholder>[BUSINESS ADDRESS]</Placeholder>.
+          These services are provided by <strong>Go Tech Solution</strong>
+          {" "}("we", "us", "our"), located at <strong>Ahmedabad, Gujarat, India</strong>.
         </p>
       </Section>
 
@@ -42,7 +42,7 @@ export default function TermsPage() {
         <p>
           We offer a 100% satisfaction guarantee: if, after the kickoff call, you decide we're not
           the right fit, or you're not satisfied with the draft, contact us and we'll make it right.
-          To request a refund or discuss a concern, email <Placeholder>[SUPPORT EMAIL]</Placeholder>.
+          To request a refund or discuss a concern, email <a href="mailto:Dhruv@go-techsolution.com">Dhruv@go-techsolution.com</a>.
         </p>
       </Section>
 
@@ -73,7 +73,7 @@ export default function TermsPage() {
 
       <Section heading="8. Governing law">
         <p>
-          These terms are governed by the laws of <Placeholder>[JURISDICTION]</Placeholder>,
+          These terms are governed by the laws of <strong>India</strong>,
           without regard to conflict-of-law principles.
         </p>
       </Section>
@@ -87,7 +87,7 @@ export default function TermsPage() {
 
       <Section heading="10. Contact us">
         <p>
-          Questions about these terms? Email us at <Placeholder>[SUPPORT EMAIL]</Placeholder>.
+          Questions about these terms? Email us at <a href="mailto:Dhruv@go-techsolution.com">Dhruv@go-techsolution.com</a>.
         </p>
       </Section>
     </LegalPage>
