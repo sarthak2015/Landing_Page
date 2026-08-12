@@ -74,7 +74,10 @@ export default function AdminDashboard() {
         return;
       }
 
-      if (!res.ok) throw new Error("Failed to fetch database records.");
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to fetch database records.");
+      }
       const data = await res.json();
       setLeads(data.leads || []);
     } catch (err: any) {

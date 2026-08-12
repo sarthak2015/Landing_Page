@@ -116,29 +116,35 @@ export async function logNotification(
   message: string,
   type: "explore" | "booking" | "submit"
 ): Promise<void> {
-  const { error } = await supabaseAdmin.from("notifications").insert({
-    id: `notif_${Math.random().toString(36).substring(2, 11)}`,
-    title,
-    message,
-    type
-  });
-
-  if (error) throw new Error(error.message);
+  try {
+    await supabaseAdmin.from("notifications").insert({
+      id: `notif_${Math.random().toString(36).substring(2, 11)}`,
+      title,
+      message,
+      type
+    });
+  } catch (err) {
+    console.warn("logNotification warning:", err);
+  }
 }
 
 export async function listNotifications(limit = 50): Promise<Notification[]> {
-  const { data, error } = await supabaseAdmin
-    .from("notifications")
-    .select("*")
-    .order("created_at", { ascending: false })
-    .limit(limit);
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("notifications")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(limit);
 
-  if (error) throw new Error(error.message);
-  return (data || []).map((row: any) => ({
-    id: row.id,
-    title: row.title,
-    message: row.message,
-    type: row.type,
-    timestamp: row.created_at
-  }));
+    if (error) return [];
+    return (data || []).map((row: any) => ({
+      id: row.id,
+      title: row.title,
+      message: row.message,
+      type: row.type,
+      timestamp: row.created_at
+    }));
+  } catch {
+    return [];
+  }
 }
