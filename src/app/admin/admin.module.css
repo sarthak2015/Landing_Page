@@ -337,3 +337,16 @@
     gap: 40px;
   }
 }
+
+@media (max-width: 600px) {
+  .headerContainer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .headerBtnGroup {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}

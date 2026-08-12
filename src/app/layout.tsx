@@ -12,12 +12,15 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+import MetaPixel from "@/components/MetaPixel";
+
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://speed.go-techsolution.com";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(baseUrl),
   title: "Go-Speed | Premium $99 Website SLA Launch",
   description: "Get a high-performance, conversion-optimized Next.js website delivered within 48 hours of our kickoff call for just $99.",
 };
-
-import MetaPixel from "@/components/MetaPixel";
 
 export default function RootLayout({
   children,

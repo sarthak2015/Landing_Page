@@ -10,8 +10,22 @@ interface FAQItemProps {
 function FAQItem({ question, answer }: FAQItemProps) {
   const [isOpen, setIsOpen] = useState(false);
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      setIsOpen(!isOpen);
+    }
+  };
+
   return (
-    <div className={`${styles.item} ${isOpen ? styles.open : ""}`} onClick={() => setIsOpen(!isOpen)}>
+    <div
+      className={`${styles.item} ${isOpen ? styles.open : ""}`}
+      onClick={() => setIsOpen(!isOpen)}
+      onKeyDown={handleKeyDown}
+      role="button"
+      tabIndex={0}
+      aria-expanded={isOpen}
+    >
       <div className={styles.questionRow}>
         <h3 className={styles.question}>{question}</h3>
         <span className={styles.arrow}>

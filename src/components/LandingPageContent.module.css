@@ -64,6 +64,17 @@
   text-decoration: underline;
 }
 
+@media (max-width: 600px) {
+  .navBar {
+    padding: 16px 16px;
+  }
+
+  .navLinks {
+    gap: 12px;
+    font-size: 0.82rem;
+  }
+}
+
 .adminLink {
   background: #000000;
   border: 1px solid #ffffff;

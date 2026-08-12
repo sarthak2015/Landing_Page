@@ -356,6 +356,7 @@ export default function PathAForm({ onSubmitSuccess, savedFormData, setSavedForm
               <div className={styles.phoneInputContainer}>
                 <select
                   name="countryCode"
+                  aria-label="Country Code"
                   value={formData.countryCode}
                   onChange={handleChange}
                   className={styles.countrySelect}
