@@ -108,11 +108,11 @@ export default function AdminDashboard() {
 
   // Filter leads based on target columns
   const bookedClients = leads.filter(
-    (l) => l.type === "build_ready" && l.status === "scheduled"
+    (l) => l.type === "build_ready"
   );
 
   const phoneInquiries = leads.filter(
-    (l) => l.type === "explore_callback" && l.status === "pending_call"
+    (l) => l.type === "explore_callback"
   );
 
   if (!isAuthenticated) {
@@ -198,8 +198,8 @@ export default function AdminDashboard() {
                   {bookedClients.map((lead) => (
                     <div key={lead.id} className={styles.leadCard}>
                       <div className={styles.cardHeaderRow}>
-                        <span className={styles.statusBadgePaid}>
-                          {lead.status.toUpperCase()}
+                        <span className={lead.status === "scheduled" ? styles.statusBadgePaid : styles.statusBadgePending}>
+                          {lead.status === "scheduled" ? "CALL SCHEDULED" : "REQUIREMENTS SUBMITTED"}
                         </span>
                         <span className={styles.timestamp}>
                           {new Date(lead.createdAt).toLocaleDateString()} {new Date(lead.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
